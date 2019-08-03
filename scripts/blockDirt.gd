@@ -13,11 +13,17 @@ func _input(event):
             toggle_selection(not selected)
     if event.is_action_released("mouse_click_left"):
         Global_controls.selectionMode_flag = false
+    if event.is_action_pressed("mouse_click_right"):
+        if mouse_entered:
+            queue_free()
         
 func _on_blockDirt_mouse_entered():
     mouse_entered = true
     if Input.is_action_pressed("mouse_click_left"):
         toggle_selection(not selected)
+    if Input.is_action_pressed("mouse_click_right"):
+        if mouse_entered:
+            queue_free()
 
 
 func _on_blockDirt_mouse_exited():
