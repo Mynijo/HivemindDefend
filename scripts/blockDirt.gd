@@ -6,7 +6,7 @@ var selected = false
 onready var Global_controls = get_node("/root/GlobalControls")
 # Called when the node enters the scene tree for the first time.
 func _ready():
-    pass # Replace with function body.
+    pass
 
 func _input(event):
     if event.is_action_pressed("mouse_click_left"):

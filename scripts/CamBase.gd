@@ -32,9 +32,9 @@ func calc_move(m_pos, delta):
     if m_pos.y > v_size.y - MOVE_MARGIN or Input.is_action_pressed("camera_down"):
         move_cam_vec += transform.basis.z      
     if Input.is_action_pressed("camera_rotate_left"):
-        cam_rotation -= 0.5
+        cam_rotation -= 1
     if Input.is_action_pressed("camera_rotate_rigth"):
-        cam_rotation += 0.5
+        cam_rotation += 1
     
     rotate(Vector3(0,1,0),cam_rotation* delta)
     global_translate(move_cam_vec * delta * MOVE_SPEED)
