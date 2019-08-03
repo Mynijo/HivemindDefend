@@ -19,6 +19,10 @@ config/name="HivemindDefends"
 run/main_scene="res://map.tscn"
 config/icon="res://icon.png"
 
+[autoload]
+
+GlobalControls="*res://scripts/GlobalControls.gd"
+
 [input]
 
 camera_zoom_in={

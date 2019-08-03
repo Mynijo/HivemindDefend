@@ -3,7 +3,7 @@
 [ext_resource path="res://kenney_platformerkit/dirt.material" type="Material" id=1]
 [ext_resource path="res://kenney_platformerkit/snow.material" type="Material" id=2]
 
-[sub_resource type="ArrayMesh" id=3]
+[sub_resource type="ArrayMesh" id=1]
 resource_name = "blockSnow(Clone)"
 surfaces/0 = {
 "aabb": AABB( -0.116514, 0, -1.11651, 1.23303, 1.00001, 1.23303 ),
@@ -39,7 +39,7 @@ collision_mask = 3
 
 [node name="blockSnow" type="MeshInstance" parent="."]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1 )
-mesh = SubResource( 3 )
+mesh = SubResource( 1 )
 material/0 = null
 material/1 = null
 

@@ -13,7 +13,7 @@ albedo_color = Color( 0.458824, 0.458824, 0.458824, 1 )
 material = SubResource( 2 )
 size = Vector3( 1, 1, 1 )
 
-[node name="blockDirt" index="0" groups=[
+[node name="blockDirt" groups=[
 "clickable",
 ] instance=ExtResource( 1 )]
 collision_layer = 3
