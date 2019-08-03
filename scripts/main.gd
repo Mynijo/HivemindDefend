@@ -1,16 +1,23 @@
 extends Spatial
 
+onready var Global_controls = get_node("/root/GlobalControls")
 
 func _ready():
-    generate_floor(10,10,1)
-    generate_floor(10,10,2)
-    generate_floor(10,10,3)
+    for i in range(Global_controls.floor_max_deeps):
+        generate_floor(10 +i,10 +i,i)
+        
+    generate_floor(10,10,Global_controls.floor_max_deeps,Vector2(0,0),true)
+    
 
-func generate_floor(var width, var length, var deeps):
+func generate_floor(var width, var length, var deeps, var offset = Vector2(0,0), var bottom_flag = false):
     var dirtBlock = load("res://mapTiles/blockDirt.tscn")
+    var Bedrock = load("res://mapTiles/Bedrock.tscn")
     for i in width:
         for n in length:
-            var temp_dirtBlock = dirtBlock.instance()
-            print(i,deeps * -1, n)
-            temp_dirtBlock.translation = Vector3(i,deeps * -1, n)
-            self.add_child(temp_dirtBlock)
+            var temp_Block
+            if i == 0 or n == 0 or i == width -1 or n == length -1 or bottom_flag:
+                temp_Block = Bedrock.instance()
+            else:
+                temp_Block = dirtBlock.instance()
+            temp_Block.translation = Vector3(i + offset.x,deeps * -1, n + offset.y)
+            self.add_child(temp_Block)

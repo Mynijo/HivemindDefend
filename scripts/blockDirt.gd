@@ -1,10 +1,8 @@
-extends StaticBody
+extends "res://scripts/block.gd"
 
 var mouse_entered = false
 var selected = false
 
-onready var Global_controls = get_node("/root/GlobalControls")
-# Called when the node enters the scene tree for the first time.
 func _ready():
     pass
 
@@ -15,7 +13,7 @@ func _input(event):
             toggle_selection(not selected)
     if event.is_action_released("mouse_click_left"):
         Global_controls.selectionMode_flag = false
-
+        
 func _on_blockDirt_mouse_entered():
     mouse_entered = true
     if Input.is_action_pressed("mouse_click_left"):
@@ -34,7 +32,6 @@ func toggle_selection(var flag):
     selected = flag     
     self.get_node("blockDirt(Clone)").visible = not flag
     self.get_node("selected").visible = flag
-
-        
+    print(self.translation.y)
         
         
