@@ -8,7 +8,7 @@ func _ready():
     pass
 
 func check_floor():
-    if self.translation.y *-1 == Global_controls.actual_floor:
+    if self.translation.y *-1 == Global_controls.actual_floor or self.translation.y *-1 == Global_controls.actual_floor +1:
         self.visible = true
     else:
         self.visible = false

@@ -16,7 +16,7 @@ func _input(event):
         actual_floor -= 1
         print(actual_floor," max:",floor_max_deeps)
         get_tree().call_group("block", "check_floor")
-    if event.is_action_pressed("floor_down") and actual_floor +1 <= floor_max_deeps:
+    if event.is_action_pressed("floor_down") and actual_floor +1 < floor_max_deeps:
         actual_floor += 1
         print(actual_floor," max:",floor_max_deeps)
         get_tree().call_group("block", "check_floor")
