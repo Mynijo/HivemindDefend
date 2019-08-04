@@ -1,16 +1,16 @@
 {
 	"name" : "First Map Config",
-	"map_size" : [50,50],
+	"map_size" : [10,10],
 	"map_areas" :
 	[
 		{
 			"name" : "Start Area",
-			"floor_range" : [5,5],
-			"default_static_game_object" : "dirt",
+			"floor_range" : [5,10],
+			"default_static_game_object" : "res://scenen/static_game_object/blocks/block_dirt.tscn",
 			"special_static_game_objects" :
 			[
 				{
-					"path" : "copper_ore",
+					"path" : "res://scenen/static_game_object/blocks/block_copper_ore.tscn",
 					"spawn_chance" : 0.1,
 					"spawn_range" : [1,-1],
 					"value_range" : [100,500]

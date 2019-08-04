@@ -6,6 +6,7 @@ var map_areas #= [map_area.new()]
 class map_area:
     var name = "default_name"
     var floor_range = Vector2(5,5)
+    var actual_range = 0
     var default_static_game_object  = ""
     var special_static_game_objects = [null]
     

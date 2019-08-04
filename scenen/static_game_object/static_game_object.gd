@@ -1,10 +1,12 @@
 extends StaticBody
 
-var selected = false
-var life_actual  = 42
-var life_max  = 42    
-var is_selectable_flag = true
 
+export (bool) var is_selectable_flag = true
+export (int) var life_max  = 42    
+export (Vector2) var size = Vector2(1,1)
+
+var life_actual  = 42
+var selected = false
 
 func _ready():
     pass # Replace with function body.

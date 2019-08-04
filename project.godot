@@ -14,13 +14,13 @@ _global_script_classes=[ {
 "language": "GDScript",
 "path": "res://scenen/map/map.gd"
 }, {
-"base": "Reference",
+"base": "Spatial",
 "class": "class_map",
 "language": "GDScript",
 "path": "res://scenen/map/map_generation.gd"
 } ]
 _global_script_class_icons={
-"class_StaticGameObject": "res://scenen/StaticGameObject/StaticGameObject.gd",
+"class_StaticGameObject": "res://scenen/static_game_object/static_game_object.gd",
 "class_map": "res://scenen/map/map.gd"
 }
 
