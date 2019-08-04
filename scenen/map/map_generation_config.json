@@ -1,0 +1,21 @@
+{
+	"name" : "First Map Config",
+	"map_size" : [50,50],
+	"map_areas" :
+	[
+		{
+			"name" : "Start Area",
+			"floor_range" : [5,5],
+			"default_static_game_object" : "dirt",
+			"special_static_game_objects" :
+			[
+				{
+					"path" : "copper_ore",
+					"spawn_chance" : 0.1,
+					"spawn_range" : [1,-1],
+					"value_range" : [100,500]
+				}
+			]
+		}
+	]
+}

@@ -8,9 +8,20 @@
 
 config_version=4
 
-_global_script_classes=[  ]
+_global_script_classes=[ {
+"base": "Spatial",
+"class": "class_StaticGameObject",
+"language": "GDScript",
+"path": "res://scenen/map/map.gd"
+}, {
+"base": "Reference",
+"class": "class_map",
+"language": "GDScript",
+"path": "res://scenen/map/map_generation.gd"
+} ]
 _global_script_class_icons={
-
+"class_StaticGameObject": "res://scenen/StaticGameObject/StaticGameObject.gd",
+"class_map": "res://scenen/map/map.gd"
 }
 
 [application]

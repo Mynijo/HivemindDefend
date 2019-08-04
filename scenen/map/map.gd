@@ -1,10 +1,13 @@
-extends "res://scenen/StaticGameObject/StaticGameObject.gd"
+extends Spatial
+class_name class_StaticGameObject, "res://scenen/StaticGameObject/StaticGameObject.gd"
+
+const Map_generator = preload("res://scenen/map/map_generation.gd")
+onready var map_generator = Map_generator.new()
 
 var map = []
 
-
-func _ready():    
-    pass
+func _ready():
+    map = map_generator.generate_map("res://scenen/map/map_generation_config.json")
                 
 func ini_map(map_size : Vector3):
     for x in range(map_size.x):
