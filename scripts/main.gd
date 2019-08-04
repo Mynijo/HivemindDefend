@@ -4,9 +4,9 @@ onready var Global_controls = get_node("/root/GlobalControls")
 
 func _ready():
     for i in range(Global_controls.floor_max_deeps):
-        generate_floor(10 +i,10 +i,i)
+        generate_floor(10,10,i)
         
-    generate_floor(10,10,Global_controls.floor_max_deeps,Vector2(0,0),true)
+    generate_floor(50,50,Global_controls.floor_max_deeps,Vector2(0,0),true)
     
 
 func generate_floor(var width, var length, var deeps, var offset = Vector2(0,0), var bottom_flag = false):

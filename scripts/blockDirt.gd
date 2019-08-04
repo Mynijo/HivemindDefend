@@ -14,7 +14,7 @@ func _input(event):
     if event.is_action_released("mouse_click_left"):
         Global_controls.selectionMode_flag = false
     if event.is_action_pressed("mouse_click_right"):
-        if mouse_entered:
+        if mouse_entered and self.translation.y *-1 == Global_controls.actual_floor:
             queue_free()
         
 func _on_blockDirt_mouse_entered():
@@ -22,7 +22,7 @@ func _on_blockDirt_mouse_entered():
     if Input.is_action_pressed("mouse_click_left"):
         toggle_selection(not selected)
     if Input.is_action_pressed("mouse_click_right"):
-        if mouse_entered:
+        if mouse_entered and self.translation.y *-1 == Global_controls.actual_floor:
             queue_free()
 
 

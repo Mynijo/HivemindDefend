@@ -8,7 +8,7 @@ onready var cam = $Camera
  
 var move_cam_vec = Vector3()
 var actual_zoom = 0
-var zoom_max_out = 15
+var zoom_max_out = 100
 var zoom_max_in = -10
 
 func _init():
