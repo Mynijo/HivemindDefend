@@ -16,12 +16,8 @@ _global_script_class_icons={
 [application]
 
 config/name="HivemindDefends"
-run/main_scene="res://map.tscn"
+run/main_scene="res://scenen/root.tscn"
 config/icon="res://icon.png"
-
-[autoload]
-
-GlobalControls="*res://scripts/GlobalControls.gd"
 
 [input]
 
