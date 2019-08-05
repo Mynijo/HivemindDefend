@@ -9,19 +9,25 @@
 config_version=4
 
 _global_script_classes=[ {
-"base": "Spatial",
+"base": "StaticBody",
 "class": "class_StaticGameObject",
 "language": "GDScript",
-"path": "res://scenen/map/map.gd"
+"path": "res://scenen/static_game_object/static_game_object.gd"
 }, {
 "base": "Spatial",
 "class": "class_map",
 "language": "GDScript",
-"path": "res://scenen/map/map_generation.gd"
+"path": "res://scenen/map/map.gd"
+}, {
+"base": "Spatial",
+"class": "class_map_node",
+"language": "GDScript",
+"path": "res://scenen/map/map_node.gd"
 } ]
 _global_script_class_icons={
-"class_StaticGameObject": "res://scenen/static_game_object/static_game_object.gd",
-"class_map": "res://scenen/map/map.gd"
+"class_StaticGameObject": "",
+"class_map": "res://scenen/map/map.gd",
+"class_map_node": "res://scenen/map/map_node.gd"
 }
 
 [application]

@@ -1,11 +1,11 @@
 {
 	"name" : "First Map Config",
-	"map_size" : [10,10],
+	"map_size" : [20,25],
 	"map_areas" :
 	[
 		{
 			"name" : "Start Area",
-			"floor_range" : [5,10],
+			"floor_range" : [100,100],
 			"default_static_game_object" : "res://scenen/static_game_object/blocks/block_dirt.tscn",
 			"special_static_game_objects" :
 			[

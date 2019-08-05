@@ -1,9 +1,11 @@
-extends StaticBody
-
+class_name class_StaticGameObject extends StaticBody
 
 export (bool) var is_selectable_flag = true
 export (int) var life_max  = 42    
 export (Vector2) var size = Vector2(1,1)
+
+export (bool) var transparent = false
+
 
 var life_actual  = 42
 var selected = false

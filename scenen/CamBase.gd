@@ -9,10 +9,11 @@ onready var cam = $Camera
 var move_cam_vec = Vector3()
 var actual_zoom = 0
 var zoom_max_out = 100
-var zoom_max_in = -10
+var zoom_max_in = -100
 
 func _init():
-    Input.set_mouse_mode(Input.MOUSE_MODE_CONFINED)
+    pass
+    #Input.set_mouse_mode(Input.MOUSE_MODE_CONFINED)
 
 func _process(delta):
     var m_pos = get_viewport().get_mouse_position()
@@ -23,13 +24,13 @@ func calc_move(m_pos, delta):
     var v_size = get_viewport().size   
     var cam_rotation = 0
 
-    if m_pos.x < MOVE_MARGIN or Input.is_action_pressed("camera_left"):
+    if Input.is_action_pressed("camera_left"):
         move_cam_vec -= transform.basis.x
-    if m_pos.y < MOVE_MARGIN or Input.is_action_pressed("camera_up"):
+    if Input.is_action_pressed("camera_up"):
         move_cam_vec -= transform.basis.z  
-    if m_pos.x > v_size.x - MOVE_MARGIN or Input.is_action_pressed("camera_right"):
+    if Input.is_action_pressed("camera_right"):
         move_cam_vec += transform.basis.x
-    if m_pos.y > v_size.y - MOVE_MARGIN or Input.is_action_pressed("camera_down"):
+    if Input.is_action_pressed("camera_down"):
         move_cam_vec += transform.basis.z      
     if Input.is_action_pressed("camera_rotate_left"):
         cam_rotation -= 1
