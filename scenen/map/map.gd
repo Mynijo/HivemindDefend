@@ -50,7 +50,7 @@ func get_map_node(Position : Vector3) -> class_map_node:
         return null        
     return map_nodes[Position.x][Position.y][Position.z]
     
-func get_map_fog_of_war_nodes(Position : Vector3) -> class_map_node:
+func get_map_fog_of_war_node(Position : Vector3) -> class_map_node:
     var map_size : Vector3 = get_map_size()
     if Position.x < 0 or Position.x >= map_size.x or \
        Position.y < 0 or Position.y >= map_size.y or \
@@ -68,13 +68,13 @@ func activate_node(Pos : Vector3):
         return
     node.active = true
     self.get_node("active_nodes").add_child(node)
-    self.get_node("fog_of_war_nodes").remove_child(get_map_fog_of_war_nodes(Pos))
+    self.get_node("fog_of_war_nodes").remove_child(get_map_fog_of_war_node(Pos))
      
 func deactivate_node(Pos : Vector3):
     var node : class_map_node = get_map_node(Pos)
     node.active = false
     self.get_node("active_nodes").remove_child(node)
-    self.get_node("fog_of_war_nodes").add_child(get_map_fog_of_war_nodes(Pos))
+    self.get_node("fog_of_war_nodes").add_child(get_map_fog_of_war_node(Pos))
     
 func get_node_neighbours(Node_pos : Vector3) -> Array:
     var neighbours = []
@@ -108,8 +108,6 @@ func get_not_active_nodes_neighbour(Node_pos : Vector3) -> Array:
             not_active_neighbours.append(node)   
     return not_active_neighbours
   
-
-
 func get_active_nodes() -> Array:
     var active_nodes = self.get_node("active_nodes").get_children()    
     return active_nodes

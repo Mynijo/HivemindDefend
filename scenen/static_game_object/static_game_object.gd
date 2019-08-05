@@ -1,4 +1,4 @@
-class_name class_StaticGameObject extends StaticBody
+class_name class_StaticGameObject extends Spatial
 
 export (bool) var is_selectable_flag = true
 export (int) var life_max  = 42    
