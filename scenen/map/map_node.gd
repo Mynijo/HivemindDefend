@@ -8,6 +8,9 @@ export (Vector3) var position = Vector3(-1,-1,-1)
 var active = false
 
 func set_static_game_object( var Static_game_object): #: class_StaticGameObject ):
+    if static_game_object:
+        self.remove_child(static_game_object)
+        Static_game_object.queue_free()
     self.add_child(Static_game_object)
     static_game_object = Static_game_object
 

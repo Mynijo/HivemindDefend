@@ -24,8 +24,7 @@ func _ready():
                     if node.is_transparent():
                         activate_node(pos)
                         break
-                                
-
+  
 func init_map_fog_of_war_nodes(map_size : Vector3):
     var class_map_node = load("res://scenen/static_game_object/static_game_object_unknown.tscn")
     var map_node = class_map_node.instance()
@@ -57,8 +56,7 @@ func get_map_fog_of_war_node(Position : Vector3) -> class_map_node:
        Position.z < 0 or Position.z >= map_size.z:
         return null        
     return map_fog_of_war_nodes[Position.x][Position.y][Position.z]
-    
-     
+   
 func set_map_nodes(var Map_nodes):
     map_nodes = Map_nodes
     
@@ -75,6 +73,12 @@ func deactivate_node(Pos : Vector3):
     node.active = false
     self.get_node("active_nodes").remove_child(node)
     self.get_node("fog_of_war_nodes").add_child(get_map_fog_of_war_node(Pos))
+    
+func replace_node_Static_game_object(Pos : Vector3,  Static_game_object : class_StaticGameObject):
+    get_map_node(Pos).set_static_game_object(Static_game_object)
+    if Static_game_object.transparent:
+        for neighbour in get_node_neighbours(Pos):
+            activate_node(neighbour.get_position())
     
 func get_node_neighbours(Node_pos : Vector3) -> Array:
     var neighbours = []
@@ -111,6 +115,6 @@ func get_not_active_nodes_neighbour(Node_pos : Vector3) -> Array:
 func get_active_nodes() -> Array:
     var active_nodes = self.get_node("active_nodes").get_children()    
     return active_nodes
-    
+      
 func get_map_size() -> Vector3:
     return Vector3(map_nodes.size(),map_nodes[0].size(),map_nodes[0][0].size())

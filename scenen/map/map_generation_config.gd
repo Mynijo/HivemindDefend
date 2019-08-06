@@ -1,12 +1,16 @@
+
+class_name class_map_generation_config, "res://scenen/map/map_generation_config.gd"
+
+
 export (String) var name = "default_name"
-export (Vector2) var map_size = Vector2(42,42)
+export (Vector2) var map_size = Vector2(-1,-1)
 
 var map_areas #= [map_area.new()]
 
 class map_area:
     var name = "default_name"
     var floor_range = Vector2(5,5)
-    var actual_range = 0
+    var rolled_floor_range = -1
     var default_static_game_object  = ""
     var special_static_game_objects = [null]
     
@@ -15,7 +19,7 @@ class class_special_static_game_object:
     var path = ""
     var spawn_chance = 0
     var spawn_range = Vector2(0,0) # -1 = no limit
-    var value_range = Vector2(0,0)
+    var rolled_spawn_range = -1
     
 
 
@@ -51,12 +55,8 @@ func load_special_game_objects_jsonResult(jsonResult : Array) -> Array:
         var temp_special_game_object = class_special_static_game_object.new()
         if object.has("path"):
             temp_special_game_object.path = object.get("path")
-        if object.has("spawn_chance"):
-            temp_special_game_object.spawn_chance = object.get("spawn_chance")
         if object.has("spawn_range"):
             temp_special_game_object.spawn_range = object.get("spawn_range")
-        if object.has("value_range"):
-            temp_special_game_object.value_range = object.get("value_range")
         temp_special_game_objects.append(temp_special_game_object)  
     return temp_special_game_objects
      
