@@ -13,6 +13,8 @@ func set_static_game_object( var Static_game_object): #: class_StaticGameObject 
         Static_game_object.queue_free()
     self.add_child(Static_game_object)
     static_game_object = Static_game_object
+    var test = self.get_children()
+    pass
 
 func get_static_game_object() -> class_StaticGameObject:
     return static_game_object

@@ -7,12 +7,14 @@ export (Vector2) var map_size = Vector2(-1,-1)
 
 var map_areas #= [map_area.new()]
 
-class map_area:
+class class_map_area:
     var name = "default_name"
     var floor_range = Vector2(5,5)
     var rolled_floor_range = -1
+    var map_scenes_path = ""
     var default_static_game_object  = ""
     var special_static_game_objects = [null]
+    var map_scenes = [null]
     
 
 class class_special_static_game_object:    
@@ -20,7 +22,7 @@ class class_special_static_game_object:
     var spawn_chance = 0
     var spawn_range = Vector2(0,0) # -1 = no limit
     var rolled_spawn_range = -1
-    
+
 
 
 func generate_config_with_json(var path) -> Object:
@@ -37,7 +39,7 @@ func generate_config_with_json(var path) -> Object:
 func load_map_areas_jsonResult(jsonResult : Array) -> Array:
     var temp_map_areas = []
     for area in jsonResult:
-        var temp_map_area = map_area.new()
+        var temp_map_area = class_map_area.new()
         if area.has("name"):
             temp_map_area.name = area.get("name")
         if area.has("floor_range"):
@@ -46,6 +48,8 @@ func load_map_areas_jsonResult(jsonResult : Array) -> Array:
             temp_map_area.default_static_game_object = area.get("default_static_game_object")               
         if area.has("special_static_game_objects"):
             temp_map_area.special_static_game_objects = load_special_game_objects_jsonResult(area.get("special_static_game_objects"))
+        if area.has("map_scenes"):
+            temp_map_area.map_scenes_path = area.get("map_scenes")              
         temp_map_areas.append(temp_map_area) 
     return temp_map_areas
     
@@ -59,8 +63,7 @@ func load_special_game_objects_jsonResult(jsonResult : Array) -> Array:
             temp_special_game_object.spawn_range = object.get("spawn_range")
         temp_special_game_objects.append(temp_special_game_object)  
     return temp_special_game_objects
-     
-   
+      
 func load_json(var path) -> JSONParseResult:
     var file = File.new()
     file.open(path, file.READ)

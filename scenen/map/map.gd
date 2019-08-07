@@ -21,9 +21,10 @@ func _ready():
                 var pos : Vector3 = z.get_position()
                 var neighbours = get_node_neighbours(pos)
                 for node in neighbours:
-                    if node.is_transparent():
+                    if node.is_transparent()or true: #remove later
                         activate_node(pos)
                         break
+    pass
   
 func init_map_fog_of_war_nodes(map_size : Vector3):
     var class_map_node = load("res://scenen/static_game_object/static_game_object_unknown.tscn")
