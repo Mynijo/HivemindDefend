@@ -5,6 +5,7 @@ const Map_generator = preload("res://scenen/map/map_generation.gd")
 onready var map_generator = Map_generator.new()
 
 export (String) var map_generation_file_path = "res://scenen/map/map_generation_config.json"
+export (bool) var fog_of_war_flag = true
 
 var map_nodes = []
 var map_fog_of_war_nodes = []
@@ -21,7 +22,7 @@ func _ready():
                 var pos : Vector3 = z.get_position()
                 var neighbours = get_node_neighbours(pos)
                 for node in neighbours:
-                    if node.is_transparent()or true: #remove later
+                    if node.is_transparent() or pos.y == 0 or not fog_of_war_flag: #remove later
                         activate_node(pos)
                         break
     pass

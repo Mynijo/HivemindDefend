@@ -109,7 +109,7 @@ func generate_temp_name_map_area(var Map_area, var Start_floor):
             var temp_aabb : AABB = AABB(game_objects[0].get_position(), Vector3(0,0,0))
             for game_object in game_objects:
                 temp_aabb = temp_aabb.expand(game_object.get_position())
-            var scene_pos_min : Vector3 = temp_aabb.get_endpoint(7)
+            var scene_pos_min : Vector3 = temp_aabb.get_endpoint(2)
             var scene_size : Vector3 = temp_aabb.size +Vector3(1,1,1)
             if map_size.x -2 > scene_size.x and \
                Map_area.rolled_floor_range >= scene_size.y and \
@@ -123,6 +123,7 @@ func generate_temp_name_map_area(var Map_area, var Start_floor):
                     var game_object_pos = (game_object.get_position() - scene_pos_min) * Vector3(1,-1,1) + sceen_rolled_start_pos
                     temp_name_map[game_object_pos.x][game_object_pos.y][game_object_pos.z] = game_object.duplicate()
                     area_block_count -= 1
+                    print(game_object_pos)
             else:
                 print("can not place scene")
 
