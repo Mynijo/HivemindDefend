@@ -68,35 +68,53 @@ func generate_temp_name_map(var map_config):
             
 func generate_temp_name_map_area(var Map_area, var Start_floor):
     var blocks = []
-    var area_block_count = (map_size.x -2) * (map_size.z -2) * Map_area.rolled_floor_range   
+    var area_block_count = (map_size.x -2) * (map_size.z -2) * Map_area.rolled_floor_range  
     
     #add scene
-    if Map_area.map_scenes_path:
-        var node_map_scene = load(Map_area.map_scenes_path)
-        var temp_node_map_scene = node_map_scene.instance()            
-        var game_objects = temp_node_map_scene.get_node("static_game_object").get_children()    
-        if game_objects:
-            var temp_aabb : AABB = AABB(game_objects[0].get_position(), Vector3(0,0,0))
-            for game_object in game_objects:
-                temp_aabb = temp_aabb.expand(game_object.get_position())
-            var scene_pos_min : Vector3 = temp_aabb.get_endpoint(2)
-            var scene_size : Vector3 = temp_aabb.size +Vector3(1,1,1)
-            if map_size.x -2 > scene_size.x and \
-               Map_area.rolled_floor_range >= scene_size.y and \
-               map_size.z -2 > scene_size.z:
-                rng.randomize()
-                var sceen_rolled_start_pos : Vector3  = Vector3(rng.randi_range(0,map_size.x -2 -scene_size.x), \
-                                                                rng.randi_range(0,Map_area.rolled_floor_range -scene_size.y), \
-                                                                rng.randi_range(0,map_size.z -2 -scene_size.z))
-                sceen_rolled_start_pos += Vector3(1,1,1) # border
+    for scene in Map_area.map_scenes:
+        if scene.path:
+            var node_map_scene = load(scene.path)
+            var temp_node_map_scene = node_map_scene.instance()            
+            var game_objects = temp_node_map_scene.get_node("static_game_object").get_children()    
+            if game_objects:
+                var temp_aabb : AABB = AABB(game_objects[0].get_position(), Vector3(0,0,0))
                 for game_object in game_objects:
-                    var game_object_pos = (game_object.get_position() - scene_pos_min) * Vector3(1,-1,1) + sceen_rolled_start_pos
-                    temp_name_map[game_object_pos.x][game_object_pos.y][game_object_pos.z] = game_object.duplicate()
-                    area_block_count -= 1
-                    print(game_object_pos)
-            else:
-                print("can not place scene")
-                                                              
+                    temp_aabb = temp_aabb.expand(game_object.get_position())
+                var scene_pos_min : Vector3 = temp_aabb.get_endpoint(2)
+                var scene_size : Vector3 = temp_aabb.size +Vector3(1,1,1)
+                if map_size.x -2 > scene_size.x and \
+                   Map_area.rolled_floor_range >= scene_size.y and \
+                   map_size.z -2 > scene_size.z:
+                    rng.randomize()
+                    if not map_size.x -2 > scene_size.x + scene.spawn_pos_range_min.x:
+                        scene.spawn_pos_range_min.x = map_size.x -2 - scene_size.x
+                    if not Map_area.rolled_floor_range >= scene_size.y + scene.spawn_pos_range_min.y:
+                        scene.spawn_pos_range_min.y = Map_area.rolled_floor_range - scene_size.y
+                    if not map_size.z -2 > scene_size.z + scene.spawn_pos_range_min.z:
+                        scene.spawn_pos_range_min.z = map_size.z -2 - scene_size.z
+                        
+                    if not map_size.x -2 > scene_size.x + scene.spawn_pos_range_max.x or scene.spawn_pos_range_max.x == -1:
+                        scene.spawn_pos_range_max.x = map_size.x -2 - scene_size.x
+                    if not Map_area.rolled_floor_range >= scene_size.y + scene.spawn_pos_range_max.y or scene.spawn_pos_range_max.y == -1:
+                        scene.spawn_pos_range_max.y = Map_area.rolled_floor_range - scene_size.y
+                    if not map_size.z -2 > scene_size.z + scene.spawn_pos_range_max.z or scene.spawn_pos_range_max.z == -1:
+                        scene.spawn_pos_range_max.z = map_size.z -2 - scene_size.z
+ 
+                    var sceen_rolled_start_pos : Vector3  = Vector3(rng.randi_range(scene.spawn_pos_range_min.x,scene.spawn_pos_range_max.x), \
+                                                                    rng.randi_range(scene.spawn_pos_range_min.y,scene.spawn_pos_range_max.y), \
+                                                                    rng.randi_range(scene.spawn_pos_range_min.z,scene.spawn_pos_range_max.z))
+                    sceen_rolled_start_pos += Vector3(1,0,1) # border
+                    for game_object in game_objects:
+                        var game_object_pos = (game_object.get_position() - scene_pos_min) * Vector3(1,-1,1) + sceen_rolled_start_pos
+                        if not temp_name_map[game_object_pos.x][game_object_pos.y +Start_floor][game_object_pos.z]:
+                            temp_name_map[game_object_pos.x][game_object_pos.y +Start_floor][game_object_pos.z] = game_object.duplicate()
+                            area_block_count -= 1
+                            print(game_object_pos)
+                        else:
+                            print("conflict at", game_object_pos)
+                else:
+                    print("can not place scene")
+                                                                  
     #add singel special_static_game_objects
     if Map_area.special_static_game_objects:
         for object in Map_area.special_static_game_objects:
@@ -117,6 +135,8 @@ func generate_temp_name_map_area(var Map_area, var Start_floor):
                     temp_name_map[x+1][y+Start_floor][z+1] =  blocks[temp_block_counter]
                 else:
                     pass
+    if temp_block_counter != 0:
+        print("ERROR: ",temp_block_counter ," BLocks left! <--------")
     
 func generate_temp_name_map_border():
     for x in range(map_size.x):
@@ -134,6 +154,7 @@ func generate_temp_name_map_border():
                
 func generate_temp_map(): 
     var counter = 0
+    var block_class_list = []
     for x in range(map_size.x):
         for y in range(map_size.y):
             for z in range(map_size.z):
@@ -143,8 +164,16 @@ func generate_temp_map():
                 var node = temp_name_map[x][y][z] 
                 var temp_block : class_StaticGameObject
                 if node:  
-                    if typeof(node) == TYPE_STRING :                
-                        var class_block = load(node)
+                    if typeof(node) == TYPE_STRING:
+                        var new_class_flag = true
+                        var class_block
+                        for block_class in block_class_list:
+                            if block_class[0] == node:
+                                class_block = block_class[1]
+                                new_class_flag = false
+                        if new_class_flag:         
+                            class_block = load(node)
+                            block_class_list.append([node, class_block])
                         temp_block = class_block.instance()
                     else:
                         temp_block = node

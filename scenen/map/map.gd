@@ -36,7 +36,6 @@ func _ready():
   
 func init_map_fog_of_war_nodes(map_size : Vector3):
     var class_map_node = load("res://scenen/static_game_object/static_game_object_unknown.tscn")
-    var map_node = class_map_node.instance()
     map_fog_of_war_nodes.resize(map_size.x)
     var fog_of_war_nodes_root = self.get_node("fog_of_war_nodes")
     self.remove_child(fog_of_war_nodes_root)
@@ -47,7 +46,7 @@ func init_map_fog_of_war_nodes(map_size : Vector3):
             map_fog_of_war_nodes[x][y] = []
             map_fog_of_war_nodes[x][y].resize(map_size.z)    # Z-dimension
             for z in map_size.z:
-                var temp_node = map_node.duplicate()
+                var temp_node = class_map_node.instance()
                 temp_node.translation = Vector3(x,y *-1,z)
                 map_fog_of_war_nodes[x][y][z] = temp_node
                 fog_of_war_nodes_root.add_child(temp_node)

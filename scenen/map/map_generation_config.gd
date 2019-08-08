@@ -23,7 +23,10 @@ class class_special_static_game_object:
     var spawn_range = Vector2(0,0) # -1 = no limit
     var rolled_spawn_range = -1
 
-
+class class_map_scene:
+    var path = ""
+    var spawn_pos_range_min :Vector3 = Vector3(0,0,0)    # ( 0, 0, 0) = dont care
+    var spawn_pos_range_max :Vector3 = Vector3(-1,-1,-1) # (-1,-1,-1) = dont care
 
 func generate_config_with_json(var path) -> Object:
     var config = load_json(path)
@@ -49,7 +52,7 @@ func load_map_areas_jsonResult(jsonResult : Array) -> Array:
         if area.has("special_static_game_objects"):
             temp_map_area.special_static_game_objects = load_special_game_objects_jsonResult(area.get("special_static_game_objects"))
         if area.has("map_scenes"):
-            temp_map_area.map_scenes_path = area.get("map_scenes")              
+            temp_map_area.map_scenes = load_map_scenes(area.get("map_scenes"))           
         temp_map_areas.append(temp_map_area) 
     return temp_map_areas
     
@@ -63,6 +66,21 @@ func load_special_game_objects_jsonResult(jsonResult : Array) -> Array:
             temp_special_game_object.spawn_range = object.get("spawn_range")
         temp_special_game_objects.append(temp_special_game_object)  
     return temp_special_game_objects
+
+func load_map_scenes(jsonResult : Array) -> Array:
+    var temp_map_scenes = []
+    for object in jsonResult:
+        var temp_map_scene = class_map_scene.new()
+        if object.has("path"):
+            temp_map_scene.path = object.get("path")
+        if object.has("spawn_pos_range_min"):
+            var temp = object.get("spawn_pos_range_min")
+            temp_map_scene.spawn_pos_range_min = Vector3(temp[0],temp[1],temp[2])
+        if object.has("spawn_pos_range_max"):
+            var temp = object.get("spawn_pos_range_max")
+            temp_map_scene.spawn_pos_range_max  = Vector3(temp[0],temp[1],temp[2])
+        temp_map_scenes.append(temp_map_scene)  
+    return temp_map_scenes
       
 func load_json(var path) -> JSONParseResult:
     var file = File.new()

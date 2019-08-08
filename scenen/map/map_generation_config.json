@@ -1,11 +1,11 @@
 {
 	"name" : "First Map Config",
-	"map_size" : [20,20],
+	"map_size" : [18,18],
 	"map_areas" :
 	[
 		{
 			"name" : "Start Area",
-			"floor_range" : [50,50],
+			"floor_range" : [2,2],
 			"default_static_game_object" : "res://scenen/static_game_object/blocks/block_dirt.tscn",
 			"special_static_game_objects" :
 			[
@@ -14,7 +14,40 @@
 					"spawn_range" : [20,20]
 				}
 			],
-			"map_scenes" : "res://scenen/map/map_scene/StartPoint.tscn"
+			"map_scenes" :
+			[
+				{
+					"path" : "res://scenen/map/map_scene/StartPoint.tscn",
+					"spawn_pos_range_min" : [0,1,0],
+					"spawn_pos_range_max" : [1,1,1]
+				},
+				{
+					"path" : "res://scenen/map/map_scene/StartPoint.tscn",
+					"spawn_pos_range_min" : [10,1,10],
+					"spawn_pos_range_max" : [10,1,10]
+				}
+			]
+		},
+		{
+			"name" : "Start Area",
+			"floor_range" : [2,2],
+			"default_static_game_object" : "res://scenen/static_game_object/blocks/block_dirt.tscn",
+			"special_static_game_objects" :
+			[
+				{
+					"path" : "res://scenen/static_game_object/blocks/block_copper_ore.tscn",
+					"spawn_range" : [20,20]
+				}
+			],
+			"map_scenes" :
+			[
+				{
+					"path" : "res://scenen/map/map_scene/StartPoint.tscn",
+				},
+				{
+					"path" : "res://scenen/map/map_scene/StartPoint.tscn",
+				}
+			]
 		}
 	]
 }
