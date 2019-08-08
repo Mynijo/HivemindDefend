@@ -15,10 +15,17 @@ var map_size : Vector3
 func _ready():
     map_nodes = map_generator.generate_map(map_generation_file_path)  
     map_size = get_map_size()
+    print("init_map_fog_of_war_nodes start")
     init_map_fog_of_war_nodes(map_size)  
+    print("init_map_fog_of_war_nodes done")
+    
+    var counter = 0
     for x in map_nodes:
         for y in x:
             for z in y:
+                counter += 1
+                if counter % 10000 == 0:
+                    print("Checked Blocks:",counter)
                 var pos : Vector3 = z.get_position()
                 var neighbours = get_node_neighbours(pos)
                 for node in neighbours:
@@ -31,6 +38,8 @@ func init_map_fog_of_war_nodes(map_size : Vector3):
     var class_map_node = load("res://scenen/static_game_object/static_game_object_unknown.tscn")
     var map_node = class_map_node.instance()
     map_fog_of_war_nodes.resize(map_size.x)
+    var fog_of_war_nodes_root = self.get_node("fog_of_war_nodes")
+    self.remove_child(fog_of_war_nodes_root)
     for x in map_size.x:
         map_fog_of_war_nodes[x] = []
         map_fog_of_war_nodes[x].resize(map_size.y)    # Y-dimension
@@ -39,9 +48,10 @@ func init_map_fog_of_war_nodes(map_size : Vector3):
             map_fog_of_war_nodes[x][y].resize(map_size.z)    # Z-dimension
             for z in map_size.z:
                 var temp_node = map_node.duplicate()
-                map_fog_of_war_nodes[x][y][z] = temp_node
                 temp_node.translation = Vector3(x,y *-1,z)
-                self.get_node("fog_of_war_nodes").add_child(temp_node)
+                map_fog_of_war_nodes[x][y][z] = temp_node
+                fog_of_war_nodes_root.add_child(temp_node)
+    self.add_child(fog_of_war_nodes_root)
                                 
 func get_map_node(Position : Vector3) -> class_map_node:
     var map_size : Vector3 = get_map_size()

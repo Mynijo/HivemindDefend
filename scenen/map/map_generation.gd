@@ -43,22 +43,8 @@ func generate_map(path) -> Array:
     generate_temp_name_map(map_config)
     generate_temp_map()
     return temp_map
-
       
-func generate_temp_name_map_border():
-    for x in range(map_size.x):
-        for y in range(map_size.y):
-            temp_name_map[x][y][0] = bedrock
-            temp_name_map[x][y][map_size.z -1] = bedrock            
-    for z in range(map_size.z):
-        for y in range(map_size.y):
-            temp_name_map[0][y][z] = bedrock
-            temp_name_map[map_size.x -1][y][z] = bedrock
-    for x in range(map_size.x):
-        for z in range(map_size.z):
-            temp_name_map[x][0][z] = top_air
-            temp_name_map[x][map_size.y-1][z] = bedrock
-                    
+                   
 func roll_ranges(map_config : class_map_generation_config):
     rng.randomize()
     
@@ -71,23 +57,7 @@ func roll_ranges(map_config : class_map_generation_config):
         map_size.y += area.rolled_floor_range
         for game_object in area.special_static_game_objects:
             game_object.rolled_spawn_range = rng.randi_range(game_object.spawn_range[0], game_object.spawn_range[1])
-           
-func generate_temp_map(): 
-    for x in range(map_size.x):
-        for y in range(map_size.y):
-            for z in range(map_size.z):
-                var node = temp_name_map[x][y][z] 
-                var temp_block : class_StaticGameObject
-                if node:  
-                    if typeof(node) == TYPE_STRING :                
-                        var class_block = load(node)
-                        temp_block = class_block.instance()
-                    else:
-                        temp_block = node
-                    temp_block.translation = Vector3(x,y *-1,z)
-                    temp_map[x][y][z].set_position(Vector3(x,y,z))
-                    temp_map[x][y][z].set_static_game_object(temp_block)
-
+ 
 func generate_temp_name_map(var map_config):   
     var areas = []
     var floor_count = 0 +1#top air
@@ -126,9 +96,7 @@ func generate_temp_name_map_area(var Map_area, var Start_floor):
                     print(game_object_pos)
             else:
                 print("can not place scene")
-
-                    
-                                                                                               
+                                                              
     #add singel special_static_game_objects
     if Map_area.special_static_game_objects:
         for object in Map_area.special_static_game_objects:
@@ -149,6 +117,37 @@ func generate_temp_name_map_area(var Map_area, var Start_floor):
                     temp_name_map[x+1][y+Start_floor][z+1] =  blocks[temp_block_counter]
                 else:
                     pass
-                
     
-    
+func generate_temp_name_map_border():
+    for x in range(map_size.x):
+        for y in range(map_size.y):
+            temp_name_map[x][y][0] = bedrock
+            temp_name_map[x][y][map_size.z -1] = bedrock            
+    for z in range(map_size.z):
+        for y in range(map_size.y):
+            temp_name_map[0][y][z] = bedrock
+            temp_name_map[map_size.x -1][y][z] = bedrock
+    for x in range(map_size.x):
+        for z in range(map_size.z):
+            temp_name_map[x][0][z] = top_air
+            temp_name_map[x][map_size.y-1][z] = bedrock
+               
+func generate_temp_map(): 
+    var counter = 0
+    for x in range(map_size.x):
+        for y in range(map_size.y):
+            for z in range(map_size.z):
+                counter += 1
+                if counter % 1000 == 0:
+                    print ("Generated Blocks:",counter)
+                var node = temp_name_map[x][y][z] 
+                var temp_block : class_StaticGameObject
+                if node:  
+                    if typeof(node) == TYPE_STRING :                
+                        var class_block = load(node)
+                        temp_block = class_block.instance()
+                    else:
+                        temp_block = node
+                    temp_block.translation = Vector3(x,y *-1,z)
+                    temp_map[x][y][z].set_position(Vector3(x,y,z))
+                    temp_map[x][y][z].set_static_game_object(temp_block)

@@ -4,6 +4,7 @@
 
 [node name="map" type="Spatial"]
 script = ExtResource( 1 )
+fog_of_war_flag = false
 
 [node name="active_nodes" type="Spatial" parent="."]
 

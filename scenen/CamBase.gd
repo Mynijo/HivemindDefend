@@ -44,7 +44,6 @@ func calc_move(m_pos, delta):
 
 func _zoom_camera(zoom):
     if actual_zoom + zoom >= zoom_max_in and actual_zoom + zoom <= zoom_max_out :
-        print(actual_zoom)
         move_cam_vec.y += zoom
         actual_zoom += zoom
    
