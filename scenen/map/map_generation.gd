@@ -2,10 +2,9 @@ extends Spatial
 
 var rng = RandomNumberGenerator.new()
 
-var temp_map =  []
-var temp_name_map =  []
+
+
 var map_config
-var map_size : Vector3
 
 func _ready():
     rng.randomize()
@@ -16,39 +15,31 @@ export (String) var top_air = "res://scenen/static_game_object/static_game_objec
 #export (String) var bedrock = "res://scenen/static_game_object/static_game_object_top_air.tscn"
 #export (String) var top_air = "res://scenen/static_game_object/blocks/block_bedrock.tscn"
 
-func ini_maps():
-    var class_map_node = load("res://scenen/map/map_node.tscn")
-    var map_node = class_map_node.instance() 
-    temp_map.resize(map_size.x)    # X-dimension
-    temp_name_map.resize(map_size.x)
-    for x in map_size.x:
-        temp_map[x] = []
-        temp_map[x].resize(map_size.y)    # Y-dimension
-        temp_name_map[x] = []
-        temp_name_map[x].resize(map_size.y)    # Y-dimension
-        for y in map_size.y:
-            temp_map[x][y] = []
-            temp_map[x][y].resize(map_size.z)    # Z-dimension
-            temp_name_map[x][y] = []
-            temp_name_map[x][y].resize(map_size.z)    # Z-dimension
-            for z in map_size.z:
-                temp_map[x][y][z] = map_node.duplicate()
+func ini_map(var Map_size : Vector3, var Temp_map):
+    Temp_map.resize(Map_size.x)    # X-dimension
+    for x in Map_size.x:
+        Temp_map[x] = []
+        Temp_map[x].resize(Map_size.y)    # Y-dimension
+        for y in Map_size.y:
+            Temp_map[x][y] = []
+            Temp_map[x][y].resize(Map_size.z)    # Z-dimension
+            for z in Map_size.z:
+                Temp_map[x][y][z] = resource_manager.get_resource("res://scenen/map/map_node.tscn").instance()
+                Temp_map[x][y][z].set_position(Vector3(x,y,z)) 
 
 func generate_map(path) -> Array:
     var class_map_generation_config = load("res://scenen/map/map_generation_config.gd")
     var map_config_generator = class_map_generation_config.new()
     map_config = map_config_generator.generate_config_with_json(path)
-    roll_ranges(map_config)
-    ini_maps()
-    generate_temp_name_map(map_config)
-    generate_temp_map()
+    var map_size = roll_ranges(map_config)    
+    var temp_map = generate_temp_name_map(map_size, map_config)
     return temp_map
       
                    
-func roll_ranges(map_config : class_map_generation_config):
+func roll_ranges(map_config : class_map_generation_config) -> Vector3:
     rng.randomize()
     
-    map_size = Vector3(0,0,0)
+    var map_size : Vector3= Vector3(0,0,0)
     map_size.x = map_config.map_size[0] +2 #border +2
     map_size.z = map_config.map_size[1] +2 #border +2
     map_size.y += 2#border +2
@@ -57,18 +48,22 @@ func roll_ranges(map_config : class_map_generation_config):
         map_size.y += area.rolled_floor_range
         for game_object in area.special_static_game_objects:
             game_object.rolled_spawn_range = rng.randi_range(game_object.spawn_range[0], game_object.spawn_range[1])
+    return map_size
  
-func generate_temp_name_map(var map_config):   
+func generate_temp_name_map(var Map_size, var map_config) -> Array:   
+    var temp_map = []
+    ini_map(Map_size, temp_map)
     var areas = []
     var floor_count = 0 +1#top air
     for area in map_config.map_areas:
-        areas.append(generate_temp_name_map_area(area,floor_count))
+        areas.append(generate_temp_name_map_area(Map_size, area,floor_count, temp_map))
         floor_count += area.rolled_floor_range
-    generate_temp_name_map_border()  
+    generate_temp_name_map_border(Map_size, temp_map)  
+    return temp_map
             
-func generate_temp_name_map_area(var Map_area, var Start_floor):
+func generate_temp_name_map_area(var Map_size,var Map_area, var Start_floor, var Temp_map):
     var blocks = []
-    var area_block_count = (map_size.x -2) * (map_size.z -2) * Map_area.rolled_floor_range  
+    var area_block_count = (Map_size.x -2) * (Map_size.z -2) * Map_area.rolled_floor_range  
     
     #add scene
     for scene in Map_area.map_scenes:
@@ -82,32 +77,34 @@ func generate_temp_name_map_area(var Map_area, var Start_floor):
                     temp_aabb = temp_aabb.expand(game_object.get_position())
                 var scene_pos_min : Vector3 = temp_aabb.get_endpoint(2)
                 var scene_size : Vector3 = temp_aabb.size +Vector3(1,1,1)
-                if map_size.x -2 > scene_size.x and \
+                if Map_size.x -2 > scene_size.x and \
                    Map_area.rolled_floor_range >= scene_size.y and \
-                   map_size.z -2 > scene_size.z:
+                   Map_size.z -2 > scene_size.z:
                     rng.randomize()
-                    if not map_size.x -2 > scene_size.x + scene.spawn_pos_range_min.x:
-                        scene.spawn_pos_range_min.x = map_size.x -2 - scene_size.x
+                    if not Map_size.x -2 > scene_size.x + scene.spawn_pos_range_min.x:
+                        scene.spawn_pos_range_min.x = Map_size.x -2 - scene_size.x
                     if not Map_area.rolled_floor_range >= scene_size.y + scene.spawn_pos_range_min.y:
                         scene.spawn_pos_range_min.y = Map_area.rolled_floor_range - scene_size.y
-                    if not map_size.z -2 > scene_size.z + scene.spawn_pos_range_min.z:
-                        scene.spawn_pos_range_min.z = map_size.z -2 - scene_size.z
+                    if not Map_size.z -2 > scene_size.z + scene.spawn_pos_range_min.z:
+                        scene.spawn_pos_range_min.z = Map_size.z -2 - scene_size.z
                         
-                    if not map_size.x -2 > scene_size.x + scene.spawn_pos_range_max.x or scene.spawn_pos_range_max.x == -1:
-                        scene.spawn_pos_range_max.x = map_size.x -2 - scene_size.x
+                    if not Map_size.x -2 > scene_size.x + scene.spawn_pos_range_max.x or scene.spawn_pos_range_max.x == -1:
+                        scene.spawn_pos_range_max.x = Map_size.x -2 - scene_size.x
                     if not Map_area.rolled_floor_range >= scene_size.y + scene.spawn_pos_range_max.y or scene.spawn_pos_range_max.y == -1:
                         scene.spawn_pos_range_max.y = Map_area.rolled_floor_range - scene_size.y
-                    if not map_size.z -2 > scene_size.z + scene.spawn_pos_range_max.z or scene.spawn_pos_range_max.z == -1:
-                        scene.spawn_pos_range_max.z = map_size.z -2 - scene_size.z
+                    if not Map_size.z -2 > scene_size.z + scene.spawn_pos_range_max.z or scene.spawn_pos_range_max.z == -1:
+                        scene.spawn_pos_range_max.z = Map_size.z -2 - scene_size.z
  
                     var sceen_rolled_start_pos : Vector3  = Vector3(rng.randi_range(scene.spawn_pos_range_min.x,scene.spawn_pos_range_max.x), \
                                                                     rng.randi_range(scene.spawn_pos_range_min.y,scene.spawn_pos_range_max.y), \
                                                                     rng.randi_range(scene.spawn_pos_range_min.z,scene.spawn_pos_range_max.z))
-                    sceen_rolled_start_pos += Vector3(1,0,1) # border
+                    sceen_rolled_start_pos += Vector3(1,Start_floor,1) # border
                     for game_object in game_objects:
                         var game_object_pos = (game_object.get_position() - scene_pos_min) * Vector3(1,-1,1) + sceen_rolled_start_pos
-                        if not temp_name_map[game_object_pos.x][game_object_pos.y +Start_floor][game_object_pos.z]:
-                            temp_name_map[game_object_pos.x][game_object_pos.y +Start_floor][game_object_pos.z] = game_object.duplicate()
+                        var node = Temp_map[game_object_pos.x][game_object_pos.y][game_object_pos.z]
+                        if not node.get_static_game_object():
+                            node.set_static_game_object(game_object.duplicate())
+                            node.get_static_game_object().set_position(Vector3(0,0,0)) #reset locan pos
                             area_block_count -= 1
                             print(game_object_pos)
                         else:
@@ -127,56 +124,28 @@ func generate_temp_name_map_area(var Map_area, var Start_floor):
     randomize()
     blocks.shuffle()
     var temp_block_counter = area_block_count
-    for x in range(map_size.x -2):
+    for x in range(Map_size.x -2):
         for y in range(Map_area.rolled_floor_range):
-            for z in range(map_size.z -2):
-                if not temp_name_map[x+1][y+Start_floor][z+1]:
+            for z in range(Map_size.z -2):
+                if not Temp_map[x+1][y+Start_floor][z+1].get_static_game_object():
                     temp_block_counter -= 1
-                    temp_name_map[x+1][y+Start_floor][z+1] =  blocks[temp_block_counter]
+                    Temp_map[x+1][y+Start_floor][z+1].set_static_game_object_path(blocks[temp_block_counter])
                 else:
                     pass
     if temp_block_counter != 0:
         print("ERROR: ",temp_block_counter ," BLocks left! <--------")
     
-func generate_temp_name_map_border():
-    for x in range(map_size.x):
-        for y in range(map_size.y):
-            temp_name_map[x][y][0] = bedrock
-            temp_name_map[x][y][map_size.z -1] = bedrock            
-    for z in range(map_size.z):
-        for y in range(map_size.y):
-            temp_name_map[0][y][z] = bedrock
-            temp_name_map[map_size.x -1][y][z] = bedrock
-    for x in range(map_size.x):
-        for z in range(map_size.z):
-            temp_name_map[x][0][z] = top_air
-            temp_name_map[x][map_size.y-1][z] = bedrock
+func generate_temp_name_map_border(var Map_size, var Temp_name_map):
+    for x in range(Map_size.x):
+        for y in range(Map_size.y):
+            Temp_name_map[x][y][0].set_static_game_object_path(bedrock)
+            Temp_name_map[x][y][Map_size.z -1].set_static_game_object_path(bedrock)       
+    for z in range(Map_size.z):
+        for y in range(Map_size.y):
+            Temp_name_map[0][y][z].set_static_game_object_path(bedrock)
+            Temp_name_map[Map_size.x -1][y][z].set_static_game_object_path(bedrock)
+    for x in range(Map_size.x):
+        for z in range(Map_size.z):
+            Temp_name_map[x][0][z].set_static_game_object_path(top_air)
+            Temp_name_map[x][Map_size.y-1][z].set_static_game_object_path(bedrock)
                
-func generate_temp_map(): 
-    var counter = 0
-    var block_class_list = []
-    for x in range(map_size.x):
-        for y in range(map_size.y):
-            for z in range(map_size.z):
-                counter += 1
-                if counter % 1000 == 0:
-                    print ("Generated Blocks:",counter)
-                var node = temp_name_map[x][y][z] 
-                var temp_block : class_StaticGameObject
-                if node:  
-                    if typeof(node) == TYPE_STRING:
-                        var new_class_flag = true
-                        var class_block
-                        for block_class in block_class_list:
-                            if block_class[0] == node:
-                                class_block = block_class[1]
-                                new_class_flag = false
-                        if new_class_flag:         
-                            class_block = load(node)
-                            block_class_list.append([node, class_block])
-                        temp_block = class_block.instance()
-                    else:
-                        temp_block = node
-                    temp_block.translation = Vector3(x,y *-1,z)
-                    temp_map[x][y][z].set_position(Vector3(x,y,z))
-                    temp_map[x][y][z].set_static_game_object(temp_block)

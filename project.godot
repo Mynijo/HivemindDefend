@@ -42,6 +42,10 @@ config/name="HivemindDefends"
 run/main_scene="res://scenen/root.tscn"
 config/icon="res://icon.png"
 
+[autoload]
+
+resource_manager="*res://scenen/manager/resource_manager.gd"
+
 [input]
 
 camera_zoom_in={
