@@ -1,9 +1,6 @@
 extends Spatial
 
 var rng = RandomNumberGenerator.new()
-
-
-
 var map_config
 
 func _ready():
@@ -15,17 +12,19 @@ export (String) var top_air = "res://scenen/static_game_object/static_game_objec
 #export (String) var bedrock = "res://scenen/static_game_object/static_game_object_top_air.tscn"
 #export (String) var top_air = "res://scenen/static_game_object/blocks/block_bedrock.tscn"
 
-func ini_map(var Map_size : Vector3, var Temp_map):
-    Temp_map.resize(Map_size.x)    # X-dimension
+func ini_map(var Map_size : Vector3) -> Array:
+    var temp_map = []
+    temp_map.resize(Map_size.x)    # X-dimension
     for x in Map_size.x:
-        Temp_map[x] = []
-        Temp_map[x].resize(Map_size.y)    # Y-dimension
+        temp_map[x] = []
+        temp_map[x].resize(Map_size.y)    # Y-dimension
         for y in Map_size.y:
-            Temp_map[x][y] = []
-            Temp_map[x][y].resize(Map_size.z)    # Z-dimension
+            temp_map[x][y] = []
+            temp_map[x][y].resize(Map_size.z)    # Z-dimension
             for z in Map_size.z:
-                Temp_map[x][y][z] = resource_manager.get_resource("res://scenen/map/map_node.tscn").instance()
-                Temp_map[x][y][z].set_position(Vector3(x,y,z)) 
+                temp_map[x][y][z] = resource_manager.get_resource("res://scenen/map/map_node.tscn").instance()
+                temp_map[x][y][z].set_position(Vector3(x,y,z)) 
+    return temp_map
 
 func generate_map(path) -> Array:
     var class_map_generation_config = load("res://scenen/map/map_generation_config.gd")
@@ -51,8 +50,7 @@ func roll_ranges(map_config : class_map_generation_config) -> Vector3:
     return map_size
  
 func generate_temp_name_map(var Map_size, var map_config) -> Array:   
-    var temp_map = []
-    ini_map(Map_size, temp_map)
+    var temp_map = ini_map(Map_size)    
     var areas = []
     var floor_count = 0 +1#top air
     for area in map_config.map_areas:

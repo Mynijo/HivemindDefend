@@ -1,11 +1,11 @@
 {
 	"name" : "First Map Config",
-	"map_size" : [18,18],
+	"map_size" : [20,20],
 	"map_areas" :
 	[
 		{
 			"name" : "Start Area",
-			"floor_range" : [5,5],
+			"floor_range" : [10,10],
 			"default_static_game_object" : "res://scenen/static_game_object/blocks/block_dirt.tscn",
 			"special_static_game_objects" :
 			[
@@ -19,14 +19,13 @@
 				{
 					"path" : "res://scenen/map/map_scene/StartPoint.tscn",
 					"spawn_pos_range_min" : [0,0,0],
-					"spawn_pos_range_max" : [0,0,0]
+					"spawn_pos_range_max" : [20,0,20]
 				},
 				{
 					"path" : "res://scenen/map/map_scene/StartPoint.tscn",
 					"spawn_pos_range_min" : [0,2,0],
 					"spawn_pos_range_max" : [0,2,0]
 				}
-
 			]
 		}
 		

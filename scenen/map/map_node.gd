@@ -28,8 +28,7 @@ func set_static_game_object( var Static_game_object): #: class_StaticGameObject 
 func activate():
     if not active:
         self.remove_child(static_game_object_unknown)
-        if not static_game_object and static_game_object_path:
-            static_game_object = resource_manager.get_resource(static_game_object_path).instance()        
+        ini_static_game_object()
         self.add_child(static_game_object)
         active = true
     
@@ -40,6 +39,22 @@ func deactivate():
         self.add_child(static_game_object_unknown)
         self.remove_child(static_game_object)
         active = false
+        
+func ini_static_game_object():
+    if not static_game_object and static_game_object_path:
+        static_game_object = resource_manager.get_resource(static_game_object_path).instance()    
+      
+func start_activate_chain(var Map, var Rec_counter = 0):
+    if active :
+        return
+    if  Rec_counter >= 800: # after 1000 the game crash
+        print("allmost died in start_activate_chain")
+        return
+    Rec_counter += 1
+    activate()
+    if is_transparent():
+        for n in Map.get_node_neighbours(position):  
+            n.start_activate_chain(Map, Rec_counter)
     
 func get_static_game_object() -> class_StaticGameObject:
     return static_game_object
@@ -55,6 +70,7 @@ func get_object_path() -> String:
     return static_game_object_path
     
 func is_transparent() -> bool:
+    ini_static_game_object()
     if static_game_object:
         return static_game_object.transparent
-    return true
+    return false

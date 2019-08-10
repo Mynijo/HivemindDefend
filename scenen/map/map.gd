@@ -19,24 +19,32 @@ func _ready():
 func gen_map_with_file(var Map_generation_file_path = "res://scenen/map/map_generation_config.json"):
     map_nodes = map_generator.generate_map(Map_generation_file_path)  
     map_size = get_map_size()
-    aply_nodes()
-    pass
+    add_nodes_to_tree()
+    activate_nodes()
+
     
-func aply_nodes():    
-    var counter = 0
+func add_nodes_to_tree():  
     for x in map_nodes:
         for y in x:
             for z in y:
                 add_child(z)
-                counter += 1
-                if counter % 10000 == 0:
-                    print("Checked Blocks:",counter)
-                var pos : Vector3 = z.get_position()
-                var neighbours = get_node_neighbours(pos)
-                for node in neighbours:
-                    if node.is_transparent() or pos.y == 0 or not fog_of_war_flag: #remove later
-                        activate_node(pos)
+
+func activate_nodes(): # Only use tis if chain_activate from block can hit more than 1000blocks
+    var map_size =  get_map_size()
+    var found_tran_node = false
+    for y in range(map_size.y):
+        found_tran_node = false
+        for x in range(map_size.x):
+            for z in range(map_size.z):
+                if get_map_node(Vector3(x,y,z)).is_transparent():
+                    found_tran_node = true
+                for n in get_node_neighbours(Vector3(x,y,z)):
+                    if n.is_transparent():
+                        get_map_node(Vector3(x,y,z)).activate()
                         break
+        if not found_tran_node:
+            return
+                
                                
 func get_map_node(Position : Vector3) -> class_map_node:
     var map_size : Vector3 = get_map_size()
