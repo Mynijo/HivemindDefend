@@ -23,7 +23,6 @@ func gen_map_with_file(var Map_generation_file_path = "res://scenen/map/map_gene
     map_size = get_map_size()
     add_nodes_to_tree()
     activate_nodes()
-    hide_floor(1)
     
 func add_nodes_to_tree():  
     for y in range(map_size.y):        
