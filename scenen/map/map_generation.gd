@@ -27,13 +27,12 @@ func ini_map(var Map_size : Vector3) -> Array:
     return temp_map
 
 func generate_map(path) -> Array:
-    var class_map_generation_config = load("res://scenen/map/map_generation_config.gd")
+    var class_map_generation_config = resource_manager.get_resource("res://scenen/map/map_generation_config.gd")
     var map_config_generator = class_map_generation_config.new()
     map_config = map_config_generator.generate_config_with_json(path)
     var map_size = roll_ranges(map_config)    
-    var temp_map = generate_temp_name_map(map_size, map_config)
-    return temp_map
-      
+    var temp_map = generate_node_map(map_size, map_config)
+    return temp_map     
                    
 func roll_ranges(map_config : class_map_generation_config) -> Vector3:
     rng.randomize()
@@ -49,16 +48,20 @@ func roll_ranges(map_config : class_map_generation_config) -> Vector3:
             game_object.rolled_spawn_range = rng.randi_range(game_object.spawn_range[0], game_object.spawn_range[1])
     return map_size
  
-func generate_temp_name_map(var Map_size, var map_config) -> Array:   
+func generate_node_map(var Map_size, var map_config) -> Array:   
     var temp_map = ini_map(Map_size)    
-    var areas = []
     var floor_count = 0 +1#top air
     for area in map_config.map_areas:
-        areas.append(generate_temp_name_map_area(Map_size, area,floor_count, temp_map))
+        generate_temp_name_map_area(Map_size, area,floor_count, temp_map)
         floor_count += area.rolled_floor_range
     generate_temp_name_map_border(Map_size, temp_map)  
     return temp_map
             
+func generate_node_map_from_dirc(var Map_size : Vector3, Map_nodes_data : Array) -> Array:   
+    var temp_map = ini_map(Map_size)
+    generate_temp_name_map_from_dirc(Map_size, temp_map, Map_nodes_data)  
+    return temp_map
+    
 func generate_temp_name_map_area(var Map_size,var Map_area, var Start_floor, var Temp_map):
     var blocks = []
     var area_block_count = (Map_size.x -2) * (Map_size.z -2) * Map_area.rolled_floor_range  
@@ -66,7 +69,7 @@ func generate_temp_name_map_area(var Map_size,var Map_area, var Start_floor, var
     #add scene
     for scene in Map_area.map_scenes:
         if scene.path:
-            var node_map_scene = load(scene.path)
+            var node_map_scene = resource_manager.get_resource(scene.path)
             var temp_node_map_scene = node_map_scene.instance()            
             var game_objects = temp_node_map_scene.get_node("static_game_object").get_children()    
             if game_objects:
@@ -107,8 +110,7 @@ func generate_temp_name_map_area(var Map_size,var Map_area, var Start_floor, var
                             print(game_object_pos)
                         else:
                             print("conflict at", game_object_pos)
-                else:
-                    print("can not place scene")
+            #temp_node_map_scene.free()
                                                                   
     #add singel special_static_game_objects
     if Map_area.special_static_game_objects:
@@ -147,3 +149,9 @@ func generate_temp_name_map_border(var Map_size, var Temp_name_map):
             Temp_name_map[x][0][z].set_static_game_object_path(top_air)
             Temp_name_map[x][Map_size.y-1][z].set_static_game_object_path(bedrock)
                
+func generate_temp_name_map_from_dirc(var Map_size, var Temp_map, Map_nodes_data : Array):
+    for node_dirc in Map_nodes_data:
+        Temp_map[node_dirc["node_position"][0]] \
+                [node_dirc["node_position"][1]] \
+                [node_dirc["node_position"][2]] \
+                    .load_from_dict(node_dirc)

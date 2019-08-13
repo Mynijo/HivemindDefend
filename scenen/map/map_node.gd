@@ -14,9 +14,12 @@ var active = false
 func _init():
     static_game_object_unknown = resource_manager.get_resource(static_game_object_unknown_path).instance()
     add_child(static_game_object_unknown)
-    
+
 func set_static_game_object_path( var path):
     static_game_object_path = path
+
+func is_active() -> bool:
+    return active
 
 func set_static_game_object( var Static_game_object): #: class_StaticGameObject ):
     if static_game_object:
@@ -28,7 +31,9 @@ func set_static_game_object( var Static_game_object): #: class_StaticGameObject 
 func activate():
     if not active:
         self.remove_child(static_game_object_unknown)
-        ini_static_game_object()
+        static_game_object_unknown.queue_free()
+        if not static_game_object and static_game_object_path:
+            static_game_object = resource_manager.get_resource(static_game_object_path).instance()    
         self.add_child(static_game_object)
         active = true
     
@@ -38,11 +43,9 @@ func deactivate():
             static_game_object_unknown = resource_manager.get_resource(static_game_object_unknown_path).instance()        
         self.add_child(static_game_object_unknown)
         self.remove_child(static_game_object)
+        static_game_object.queue_free()
         active = false
         
-func ini_static_game_object():
-    if not static_game_object and static_game_object_path:
-        static_game_object = resource_manager.get_resource(static_game_object_path).instance()    
       
 func start_activate_chain(var Map, var Rec_counter = 0):
     if active :
@@ -67,10 +70,40 @@ func get_position() -> Vector3:
     return position
         
 func get_object_path() -> String:
+    if not static_game_object_path:
+        if get_static_game_object():
+            return get_static_game_object().get_filename()
     return static_game_object_path
     
 func is_transparent() -> bool:
-    ini_static_game_object()
-    if static_game_object:
-        return static_game_object.transparent
-    return false
+    var trans : bool = false     
+    if not static_game_object and static_game_object_path:
+        var temp_static_game_object = resource_manager.get_resource(static_game_object_path).instance()    
+        trans = temp_static_game_object.transparent
+        temp_static_game_object.free()
+    elif static_game_object:
+        trans = static_game_object.transparent
+    return trans
+    
+func save_to_dict()->Dictionary:
+    var path : String = get_object_path()
+    var pos = get_position()
+    var save_node_dict : Dictionary ={
+        "object_path" : path,
+        "node_position" : [pos.x, pos.y, pos.z],
+        "node_active" : is_active(),
+    } 
+    return save_node_dict
+    
+func load_from_dict(Data_dict : Dictionary):
+    if Data_dict.has("object_path"):
+        set_static_game_object_path(Data_dict.get("object_path"))
+    if Data_dict.has("node_position"):
+        set_position(Vector3(Data_dict.get("node_position")[0], \
+                             Data_dict.get("node_position")[1], \
+                             Data_dict.get("node_position")[2]))    
+    if Data_dict.has("node_active"):
+        if Data_dict.get("node_active"):
+            activate()
+    
+    

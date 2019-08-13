@@ -45,6 +45,7 @@ config/icon="res://icon.png"
 [autoload]
 
 resource_manager="*res://scenen/manager/resource_manager.gd"
+save_load_manager="*res://scenen/manager/save_load_manager.gd"
 
 [input]
 
