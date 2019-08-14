@@ -19,7 +19,6 @@ func _process(delta):
     var m_pos = get_viewport().get_mouse_position()
     calc_move(m_pos, delta)
 
-
 func calc_move(m_pos, delta):
     var v_size = get_viewport().size
     var cam_rotation = 0
@@ -36,7 +35,10 @@ func calc_move(m_pos, delta):
         cam_rotation -= 1
     if Input.is_action_pressed("camera_rotate_rigth"):
         cam_rotation += 1
-
+    if Input.is_action_pressed("camera_zoom_in"):
+        _zoom_camera(-1)
+    if Input.is_action_pressed("camera_zoom_out"):
+        _zoom_camera(1)
     rotate(Vector3(0,1,0),cam_rotation* delta)
     global_translate(move_cam_vec * delta * MOVE_SPEED)
     move_cam_vec = Vector3()
@@ -48,7 +50,8 @@ func _zoom_camera(zoom):
         actual_zoom += zoom
 
 func _input(event):
-    if event.is_action_pressed("camera_zoom_in"):
-        _zoom_camera(-1)
-    elif event.is_action_pressed("camera_zoom_out"):
-        _zoom_camera(1)
+    if event is InputEventMouseButton:
+        if event.is_action_pressed("camera_zoom_in"):
+            _zoom_camera(-1)
+        elif event.is_action_pressed("camera_zoom_out"):
+            _zoom_camera(1)
