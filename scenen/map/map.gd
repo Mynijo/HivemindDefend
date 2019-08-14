@@ -9,7 +9,8 @@ export (bool) var fog_of_war_flag = true
 
 var map_nodes = []
 var map_size : Vector3
-var map_floor_root_nods = []
+
+var map_floor_root_nodes = []
 
 func _init():
     map_generator = MapGenerator.new()
@@ -23,14 +24,15 @@ func gen_map_with_file(var Map_generation_file_path = "res://scenen/map/map_gene
     add_nodes_to_tree()
     activate_nodes()
 
-func add_nodes_to_tree():
-    for y in range(map_size.y):
-        var node = Node.new()
+func add_nodes_to_tree():  
+    for y in range(map_size.y):               
+        var node = Spatial.new()
         node.name = str("Floor_", y)
-        map_floor_root_nods.append(node)
+        map_floor_root_nodes.append(weakref(node))
         for x in range(map_size.x):
             for z in range(map_size.z):
                 node.add_child(map_nodes[x][y][z])
+        add_child(node)
         show_floor(y)
 
 # Only use tis if chain_activate from block can hit more than 1000blocks
@@ -57,17 +59,11 @@ func get_map_node(Position : Vector3) -> MapNode:
         return null
     return map_nodes[Position.x][Position.y][Position.z]
 
-func hide_floor(floor_number : int):
-    if floor_number >= map_floor_root_nods.size() or floor_number < 0:
-        return
-    if self.has_node(map_floor_root_nods[floor_number].name):
-        self.remove_child(map_floor_root_nods[floor_number])
+func hide_floor(floor_number : int):  
+    map_floor_root_nodes[floor_number].get_ref().hide()
 
 func show_floor(floor_number : int):
-    if floor_number >= map_floor_root_nods.size() or floor_number < 0:
-        return
-    if not self.has_node(map_floor_root_nods[floor_number].name):
-        self.add_child(map_floor_root_nods[floor_number])
+    map_floor_root_nodes[floor_number].get_ref().show()
 
 func set_map_nodes(var Map_nodes):
     map_nodes = Map_nodes
@@ -120,9 +116,29 @@ func get_not_active_nodes_neighbour(Node_pos : Vector3) -> Array:
             not_active_neighbours.append(node)
     return not_active_neighbours
 
-func get_active_nodes() -> Array:
-    var active_nodes = self.get_node("active_nodes").get_children()
-    return active_nodes
-
 func get_map_size() -> Vector3:
     return Vector3(map_nodes.size(),map_nodes[0].size(),map_nodes[0][0].size())
+
+func save() -> Dictionary:
+    var save_node_array : Array = []
+    for x in map_nodes:
+        for y in x:
+            for node in y:      
+                save_node_array.append(node.save_to_dict())         
+    var save_node_dict : Dictionary ={
+        "map_size" : [map_size.x, map_size.y, map_size.z],
+        "map_nodes" : save_node_array
+    }         
+    var save_map_dict : Dictionary ={
+        "filename" : get_filename(),
+        "parent" : get_parent().get_path(),
+        "data": save_node_dict
+    }    
+    return save_map_dict
+    
+func load_game(data : Dictionary):
+    var map_size_array = data["map_size"]
+    map_size = Vector3(map_size_array[0],map_size_array[1],map_size_array[2])
+    var test = data["map_nodes"]
+    map_nodes = map_generator.generate_node_map_from_dirc(map_size, data["map_nodes"])  
+    add_nodes_to_tree()
