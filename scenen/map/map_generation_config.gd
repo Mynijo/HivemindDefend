@@ -15,9 +15,9 @@ class class_map_area:
     var default_static_game_object  = ""
     var special_static_game_objects = [null]
     var map_scenes = [null]
-    
 
-class class_special_static_game_object:    
+
+class class_special_static_game_object:
     var path = ""
     var spawn_chance = 0
     var spawn_range = Vector2(0,0) # -1 = no limit
@@ -30,11 +30,11 @@ class class_map_scene:
 
 func generate_config_with_json(var path) -> Object:
     var config = load_json(path)
-    
+
     if config.has("name"):
         name = config.get("name")
     if config.has("map_size"):
-        map_size = config.get("map_size")    
+        map_size = config.get("map_size")
     if config.has("map_areas"):
         map_areas = load_map_areas_jsonResult(config.get("map_areas"))
     return self
@@ -48,14 +48,14 @@ func load_map_areas_jsonResult(jsonResult : Array) -> Array:
         if area.has("floor_range"):
             temp_map_area.floor_range =area.get("floor_range")
         if area.has("default_static_game_object"):
-            temp_map_area.default_static_game_object = area.get("default_static_game_object")               
+            temp_map_area.default_static_game_object = area.get("default_static_game_object")
         if area.has("special_static_game_objects"):
             temp_map_area.special_static_game_objects = load_special_game_objects_jsonResult(area.get("special_static_game_objects"))
         if area.has("map_scenes"):
-            temp_map_area.map_scenes = load_map_scenes(area.get("map_scenes"))           
-        temp_map_areas.append(temp_map_area) 
+            temp_map_area.map_scenes = load_map_scenes(area.get("map_scenes"))
+        temp_map_areas.append(temp_map_area)
     return temp_map_areas
-    
+
 func load_special_game_objects_jsonResult(jsonResult : Array) -> Array:
     var temp_special_game_objects = []
     for object in jsonResult:
@@ -64,7 +64,7 @@ func load_special_game_objects_jsonResult(jsonResult : Array) -> Array:
             temp_special_game_object.path = object.get("path")
         if object.has("spawn_range"):
             temp_special_game_object.spawn_range = object.get("spawn_range")
-        temp_special_game_objects.append(temp_special_game_object)  
+        temp_special_game_objects.append(temp_special_game_object)
     return temp_special_game_objects
 
 func load_map_scenes(jsonResult : Array) -> Array:
@@ -79,12 +79,12 @@ func load_map_scenes(jsonResult : Array) -> Array:
         if object.has("spawn_pos_range_max"):
             var temp = object.get("spawn_pos_range_max")
             temp_map_scene.spawn_pos_range_max  = Vector3(temp[0],temp[1],temp[2])
-        temp_map_scenes.append(temp_map_scene)  
+        temp_map_scenes.append(temp_map_scene)
     return temp_map_scenes
-      
+
 func load_json(var path) -> JSONParseResult:
     var file = File.new()
     file.open(path, file.READ)
-    var config = parse_json(file.get_as_text()) 
-    file.close()      
+    var config = parse_json(file.get_as_text())
+    file.close()
     return config

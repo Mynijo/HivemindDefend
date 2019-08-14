@@ -14,7 +14,7 @@ var active = false
 func _init():
     static_game_object_unknown = resource_manager.get_resource(static_game_object_unknown_path).instance()
     add_child(static_game_object_unknown)
-    
+
 func set_static_game_object_path( var path):
     static_game_object_path = path
 
@@ -31,19 +31,19 @@ func activate():
         ini_static_game_object()
         self.add_child(static_game_object)
         active = true
-    
+
 func deactivate():
     if active:
         if not static_game_object_unknown and static_game_object_unknown_path:
-            static_game_object_unknown = resource_manager.get_resource(static_game_object_unknown_path).instance()        
+            static_game_object_unknown = resource_manager.get_resource(static_game_object_unknown_path).instance()
         self.add_child(static_game_object_unknown)
         self.remove_child(static_game_object)
         active = false
-        
+
 func ini_static_game_object():
     if not static_game_object and static_game_object_path:
-        static_game_object = resource_manager.get_resource(static_game_object_path).instance()    
-      
+        static_game_object = resource_manager.get_resource(static_game_object_path).instance()
+
 func start_activate_chain(var Map, var Rec_counter = 0):
     if active :
         return
@@ -53,22 +53,22 @@ func start_activate_chain(var Map, var Rec_counter = 0):
     Rec_counter += 1
     activate()
     if is_transparent():
-        for n in Map.get_node_neighbours(position):  
+        for n in Map.get_node_neighbours(position):
             n.start_activate_chain(Map, Rec_counter)
-    
+
 func get_static_game_object() -> class_StaticGameObject:
     return static_game_object
-    
+
 func set_position(Pos : Vector3):
     self.translation = Pos * Vector3(1,-1,1)
     position = Pos
 
 func get_position() -> Vector3:
     return position
-        
+
 func get_object_path() -> String:
     return static_game_object_path
-    
+
 func is_transparent() -> bool:
     ini_static_game_object()
     if static_game_object:
