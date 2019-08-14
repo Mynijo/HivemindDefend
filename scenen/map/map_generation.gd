@@ -112,6 +112,7 @@ func generate_temp_name_map_area(var Map_size,var Map_area, var Start_floor, var
                             area_block_count -= 1
                         else:
                             print("conflict at", game_object_pos)
+                            game_object.free()
             temp_node_map_scene.free()
 
     #add singel special_static_game_objects

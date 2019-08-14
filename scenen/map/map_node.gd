@@ -23,8 +23,9 @@ func is_active() -> bool:
 func set_static_game_object( var Static_game_object): #: class_StaticGameObject ):
     if static_game_object:
         Static_game_object.queue_free()
-    if active:
-        self.add_child(Static_game_object)
+    self.add_child(Static_game_object)    
+    if not active:
+        Static_game_object.hide()
     static_game_object = Static_game_object
 
 func activate():
