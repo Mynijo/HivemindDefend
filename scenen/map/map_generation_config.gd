@@ -1,7 +1,3 @@
-
-class_name class_map_generation_config, "res://scenen/map/map_generation_config.gd"
-
-
 export (String) var name = "default_name"
 export (Vector2) var map_size = Vector2(-1,-1)
 

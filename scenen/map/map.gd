@@ -1,19 +1,18 @@
 extends Spatial
-class_name class_map, "res://scenen/map/map.gd"
+
+const MapNode = preload("res://scenen/map/map_node.gd")
+const MapGenerator = preload("res://scenen/map/map_generation.gd")
 
 var map_generator
 
 export (bool) var fog_of_war_flag = true
 
 var map_nodes = []
-
 var map_size : Vector3
-
 var map_floor_root_nods = []
 
 func _init():
-    var class_map_generator = preload("res://scenen/map/map_generation.gd")
-    map_generator = class_map_generator.new()
+    map_generator = MapGenerator.new()
 
 func _ready():
     pass
@@ -37,7 +36,6 @@ func add_nodes_to_tree():
 # Only use tis if chain_activate from block can hit more than 1000blocks
 # Only activate_nodes that are connected to floor 0 with tran blocks
 func activate_nodes():
-    var map_size =  get_map_size()
     var found_tran_node = false
     for y in range(map_size.y):
         found_tran_node = false
@@ -52,8 +50,7 @@ func activate_nodes():
         if not found_tran_node:
             return
 
-func get_map_node(Position : Vector3) -> class_map_node:
-    var map_size : Vector3 = get_map_size()
+func get_map_node(Position : Vector3) -> MapNode:
     if Position.x < 0 or Position.x >= map_size.x or \
        Position.y < 0 or Position.y >= map_size.y or \
        Position.z < 0 or Position.z >= map_size.z:
@@ -72,18 +69,17 @@ func show_floor(floor_number : int):
     if not self.has_node(map_floor_root_nods[floor_number].name):
         self.add_child(map_floor_root_nods[floor_number])
 
-
 func set_map_nodes(var Map_nodes):
     map_nodes = Map_nodes
 
 func activate_node(Pos : Vector3):
-    var node : class_map_node = get_map_node(Pos)
+    var node : MapNode = get_map_node(Pos)
     if node.active == true:
         return
     node.activate()
 
 func deactivate_node(Pos : Vector3):
-    var node : class_map_node = get_map_node(Pos)
+    var node : MapNode = get_map_node(Pos)
     node.deactivate()
 
 func replace_node_Static_game_object(Pos : Vector3,  Static_game_object : class_StaticGameObject):

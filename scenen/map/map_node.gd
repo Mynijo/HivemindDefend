@@ -1,5 +1,4 @@
 extends Spatial
-class_name class_map_node, "res://scenen/map/map_node.gd"
 
 var static_game_object_unknown_path= "res://scenen/static_game_object/static_game_object_unknown.tscn"
 

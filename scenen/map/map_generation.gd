@@ -1,5 +1,8 @@
 extends Spatial
 
+const MapNode = preload("res://scenen/map/map_node.gd")
+const MapGenerationConfig = preload("res://scenen/map/map_generation_config.gd")
+
 var rng = RandomNumberGenerator.new()
 var map_config
 
@@ -22,20 +25,19 @@ func ini_map(var Map_size : Vector3) -> Array:
             temp_map[x][y] = []
             temp_map[x][y].resize(Map_size.z)    # Z-dimension
             for z in Map_size.z:
-                temp_map[x][y][z] = resource_manager.get_resource("res://scenen/map/map_node.tscn").instance()
+                temp_map[x][y][z] = MapNode.new()
                 temp_map[x][y][z].set_position(Vector3(x,y,z))
     return temp_map
 
 func generate_map(path) -> Array:
-    var class_map_generation_config = load("res://scenen/map/map_generation_config.gd")
-    var map_config_generator = class_map_generation_config.new()
+    var map_config_generator = MapGenerationConfig.new()
     map_config = map_config_generator.generate_config_with_json(path)
     var map_size = roll_ranges(map_config)
     var temp_map = generate_temp_name_map(map_size, map_config)
     return temp_map
 
 
-func roll_ranges(map_config : class_map_generation_config) -> Vector3:
+func roll_ranges(map_config : MapGenerationConfig) -> Vector3:
     rng.randomize()
 
     var map_size : Vector3= Vector3(0,0,0)
