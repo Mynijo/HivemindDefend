@@ -10,5 +10,4 @@ func get_resource(path : String) -> Node:
         return loaded_resources.get(path)
     else:
         loaded_resources[path] = load(path)    
-        print("Load: ", path)
         return get_resource(path)

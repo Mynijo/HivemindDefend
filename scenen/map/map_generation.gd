@@ -107,10 +107,9 @@ func generate_temp_name_map_area(var Map_size,var Map_area, var Start_floor, var
                             node.set_static_game_object(game_object.duplicate())
                             node.get_static_game_object().set_position(Vector3(0,0,0)) #reset locan pos
                             area_block_count -= 1
-                            print(game_object_pos)
                         else:
                             print("conflict at", game_object_pos)
-            #temp_node_map_scene.free()
+            temp_node_map_scene.free()
                                                                   
     #add singel special_static_game_objects
     if Map_area.special_static_game_objects:

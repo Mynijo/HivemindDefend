@@ -9,7 +9,7 @@ var map_nodes = []
 
 var map_size : Vector3
 
-var map_floor_root_nods = []
+var map_floor_root_nodes = []
 
 func _init():
     var class_map_generator = preload("res://scenen/map/map_generation.gd")
@@ -25,13 +25,14 @@ func gen_map_with_file(var Map_generation_file_path = "res://scenen/map/map_gene
     activate_nodes()
     
 func add_nodes_to_tree():  
-    for y in range(map_size.y):        
-        var node = Node.new()
+    for y in range(map_size.y):               
+        var node = Spatial.new()
         node.name = str("Floor_", y)
-        map_floor_root_nods.append(node)
+        map_floor_root_nodes.append(weakref(node))
         for x in range(map_size.x):
             for z in range(map_size.z):
                 node.add_child(map_nodes[x][y][z])
+        add_child(node)
         show_floor(y)
         
 # Only use tis if chain_activate from block can hit more than 1000blocks
@@ -61,16 +62,10 @@ func get_map_node(Position : Vector3) -> class_map_node:
     return map_nodes[Position.x][Position.y][Position.z]
 
 func hide_floor(floor_number : int):  
-    if floor_number >= map_floor_root_nods.size() or floor_number < 0:
-        return
-    if self.has_node(map_floor_root_nods[floor_number].name):
-        self.remove_child(map_floor_root_nods[floor_number])
+    map_floor_root_nodes[floor_number].get_ref().hide()
         
 func show_floor(floor_number : int):
-    if floor_number >= map_floor_root_nods.size() or floor_number < 0:
-        return
-    if not self.has_node(map_floor_root_nods[floor_number].name):
-        self.add_child(map_floor_root_nods[floor_number])
+    map_floor_root_nodes[floor_number].get_ref().show()
                 
 func set_map_nodes(var Map_nodes):
     map_nodes = Map_nodes

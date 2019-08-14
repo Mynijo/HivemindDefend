@@ -5,7 +5,7 @@
 	[
 		{
 			"name" : "Start Area",
-			"floor_range" : [10,10],
+			"floor_range" : [20,20],
 			"default_static_game_object" : "res://scenen/static_game_object/blocks/block_dirt.tscn",
 			"special_static_game_objects" :
 			[

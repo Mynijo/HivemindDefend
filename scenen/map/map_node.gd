@@ -30,8 +30,7 @@ func set_static_game_object( var Static_game_object): #: class_StaticGameObject 
 
 func activate():
     if not active:
-        self.remove_child(static_game_object_unknown)
-        static_game_object_unknown.queue_free()
+        static_game_object_unknown.hide()
         if not static_game_object and static_game_object_path:
             static_game_object = resource_manager.get_resource(static_game_object_path).instance()    
         self.add_child(static_game_object)
