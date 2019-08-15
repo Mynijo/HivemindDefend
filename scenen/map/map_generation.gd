@@ -51,8 +51,8 @@ func roll_ranges(map_config : MapGenerationConfig) -> Vector3:
             game_object.rolled_spawn_range = rng.randi_range(game_object.spawn_range[0], game_object.spawn_range[1])
     return map_size
 
-func generate_node_map(var Map_size, var map_config) -> Array:   
-    var temp_map = ini_map(Map_size)    
+func generate_node_map(var Map_size, var map_config) -> Array:
+    var temp_map = ini_map(Map_size)
     var floor_count = 0 +1#top air
     for area in map_config.map_areas:
         generate_temp_name_map_area(Map_size, area,floor_count, temp_map)
@@ -60,9 +60,9 @@ func generate_node_map(var Map_size, var map_config) -> Array:
     generate_temp_name_map_border(Map_size, temp_map)
     return temp_map
 
-func generate_node_map_from_dirc(var Map_size : Vector3, Map_nodes_data : Array) -> Array:   
+func generate_node_map_from_dirc(var Map_size : Vector3, Map_nodes_data : Array) -> Array:
     var temp_map = ini_map(Map_size)
-    generate_temp_name_map_from_dirc(Map_size, temp_map, Map_nodes_data)  
+    generate_temp_name_map_from_dirc(Map_size, temp_map, Map_nodes_data)
     return temp_map
 
 func generate_temp_name_map_area(var Map_size,var Map_area, var Start_floor, var Temp_map):

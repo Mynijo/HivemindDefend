@@ -24,8 +24,8 @@ func gen_map_with_file(var Map_generation_file_path = "res://scenen/map/map_gene
     add_nodes_to_tree()
     activate_nodes()
 
-func add_nodes_to_tree():  
-    for y in range(map_size.y):               
+func add_nodes_to_tree():
+    for y in range(map_size.y):
         var node = Spatial.new()
         node.name = str("Floor_", y)
         map_floor_root_nodes.append(weakref(node))
@@ -59,7 +59,7 @@ func get_map_node(Position : Vector3) -> MapNode:
         return null
     return map_nodes[Position.x][Position.y][Position.z]
 
-func hide_floor(floor_number : int):  
+func hide_floor(floor_number : int):
     map_floor_root_nodes[floor_number].get_ref().hide()
 
 func show_floor(floor_number : int):
@@ -123,22 +123,22 @@ func save() -> Dictionary:
     var save_node_array : Array = []
     for x in map_nodes:
         for y in x:
-            for node in y:      
-                save_node_array.append(node.save_to_dict())         
+            for node in y:
+                save_node_array.append(node.save_to_dict())
     var save_node_dict : Dictionary ={
         "map_size" : [map_size.x, map_size.y, map_size.z],
         "map_nodes" : save_node_array
-    }         
+    }
     var save_map_dict : Dictionary ={
         "filename" : get_filename(),
         "parent" : get_parent().get_path(),
         "data": save_node_dict
-    }    
+    }
     return save_map_dict
-    
+
 func load_game(data : Dictionary):
     var map_size_array = data["map_size"]
     map_size = Vector3(map_size_array[0],map_size_array[1],map_size_array[2])
     var test = data["map_nodes"]
-    map_nodes = map_generator.generate_node_map_from_dirc(map_size, data["map_nodes"])  
+    map_nodes = map_generator.generate_node_map_from_dirc(map_size, data["map_nodes"])
     add_nodes_to_tree()

@@ -12,10 +12,10 @@ func save_game(Save_file : String = default_save_file ):
     var node_data : Array = []
     for i in save_nodes:
         node_data.append(i.call("save"))
-    
+
     save_game.store_line(to_json(node_data))
     save_game.close()
-    
+
 
 
 func load_game(Save_file : String = default_save_file ):
@@ -33,9 +33,9 @@ func load_game(Save_file : String = default_save_file ):
     save_game.open("res://saves/savegame.save", File.READ)
 
     var parsed_json = parse_json(save_game.get_as_text())
-    
-    for n in parsed_json:        
-        var new_object = resource_manager.get_resource(n["filename"]).instance()   
+
+    for n in parsed_json:
+        var new_object = resource_manager.get_resource(n["filename"]).instance()
         new_object.load_game(n["data"])
         get_node(n["parent"]).add_child(new_object)
     save_game.close()

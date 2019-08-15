@@ -23,7 +23,7 @@ func is_active() -> bool:
 func set_static_game_object( var Static_game_object): #: class_StaticGameObject ):
     if static_game_object:
         Static_game_object.queue_free()
-    self.add_child(Static_game_object)    
+    self.add_child(Static_game_object)
     if not active:
         Static_game_object.hide()
     static_game_object = Static_game_object
@@ -32,7 +32,7 @@ func activate():
     if not active:
         static_game_object_unknown.hide()
         if not static_game_object and static_game_object_path:
-            static_game_object = resource_manager.get_resource(static_game_object_path).instance()    
+            static_game_object = resource_manager.get_resource(static_game_object_path).instance()
         self.add_child(static_game_object)
         active = true
 
@@ -74,15 +74,15 @@ func get_object_path() -> String:
     return static_game_object_path
 
 func is_transparent() -> bool:
-    var trans : bool = false     
+    var trans : bool = false
     if not static_game_object and static_game_object_path:
-        var temp_static_game_object = resource_manager.get_resource(static_game_object_path).instance()    
+        var temp_static_game_object = resource_manager.get_resource(static_game_object_path).instance()
         trans = temp_static_game_object.transparent
         temp_static_game_object.free()
     elif static_game_object:
         trans = static_game_object.transparent
     return trans
-    
+
 func save_to_dict()->Dictionary:
     var path : String = get_object_path()
     var pos = get_position()
@@ -90,16 +90,16 @@ func save_to_dict()->Dictionary:
         "object_path" : path,
         "node_position" : [pos.x, pos.y, pos.z],
         "node_active" : is_active(),
-    } 
+    }
     return save_node_dict
-    
+
 func load_from_dict(Data_dict : Dictionary):
     if Data_dict.has("object_path"):
         set_static_game_object_path(Data_dict.get("object_path"))
     if Data_dict.has("node_position"):
         set_position(Vector3(Data_dict.get("node_position")[0], \
                              Data_dict.get("node_position")[1], \
-                             Data_dict.get("node_position")[2]))    
+                             Data_dict.get("node_position")[2]))
     if Data_dict.has("node_active"):
         if Data_dict.get("node_active"):
             activate()
