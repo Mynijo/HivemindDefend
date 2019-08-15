@@ -1,9 +1,6 @@
 extends Spatial
 
 const MapNode = preload("res://scenen/map/map_node.gd")
-const MapGenerator = preload("res://scenen/map/map_generation.gd")
-
-var map_generator
 
 export (bool) var fog_of_war_flag = true
 
@@ -13,13 +10,13 @@ var map_size : Vector3
 var map_floor_root_nodes = []
 
 func _init():
-    map_generator = MapGenerator.new()
+    pass
 
 func _ready():
     pass
 
 func gen_map_with_file(var Map_generation_file_path = "res://scenen/map/map_generation_config.json"):
-    map_nodes = map_generator.generate_map(Map_generation_file_path)
+    map_nodes = $MapGenerator.generate_map(Map_generation_file_path)
     map_size = get_map_size()
     add_nodes_to_tree()
     activate_nodes()
@@ -140,5 +137,5 @@ func load_game(data : Dictionary):
     var map_size_array = data["map_size"]
     map_size = Vector3(map_size_array[0],map_size_array[1],map_size_array[2])
     var test = data["map_nodes"]
-    map_nodes = map_generator.generate_node_map_from_dirc(map_size, data["map_nodes"])
+    map_nodes = $MapGenerator.generate_node_map_from_dirc(map_size, data["map_nodes"])
     add_nodes_to_tree()

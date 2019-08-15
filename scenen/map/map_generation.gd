@@ -1,4 +1,4 @@
-
+extends Node
 
 const MapNode = preload("res://scenen/map/map_node.gd")
 const MapGenerationConfig = preload("res://scenen/map/map_generation_config.gd")
