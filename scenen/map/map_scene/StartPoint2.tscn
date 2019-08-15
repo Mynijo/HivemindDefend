@@ -1,0 +1,19 @@
+[gd_scene load_steps=2 format=2]
+
+[ext_resource path="res://scenen/map/BlockLibrary.tres" type="MeshLibrary" id=1]
+
+[node name="StartPoint" type="Spatial"]
+
+[node name="GridMap" type="GridMap" parent="."]
+mesh_library = ExtResource( 1 )
+cell_size = Vector3( 1, 1, 1 )
+cell_center_x = false
+cell_center_y = false
+cell_center_z = false
+data = {
+"cells": PoolIntArray( 0, 0, 851968, 1, 0, 851968, 65535, 0, 851968, 65536, 0, 851969, 65537, 0, 851971, 131071, 0, 851971, 0, 1, 851968, 1, 1, 851968, 65535, 1, -1609760768, 65536, 1, -1609760765, 65537, 1, 851971, 131071, 1, 851971, 65536, 2, 851971, 65536, 3, 851971, 65536, 4, -1609760765, 65536, 5, -1609760765, 65536, 6, -1609760765, 65536, 7, -1609760765, 0, 65535, -1609760768, 1, 65535, 851968, 65535, 65535, 851968, 65536, 65535, 851971, 65537, 65535, 851971, 131071, 65535, 851971 )
+}
+__meta__ = {
+"_editor_clip_": 0,
+"_editor_floor_": Vector3( 0, 0, 0 )
+}
