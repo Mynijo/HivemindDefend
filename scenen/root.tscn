@@ -19,3 +19,14 @@ current = true
 transform = Transform( 0.939693, -0.321394, 0.116978, 0, 0.34202, 0.939693, -0.34202, -0.883022, 0.321394, 0, 0, 0 )
 
 [node name="Map" parent="." instance=ExtResource( 3 )]
+
+[node name="SaveTimer" type="Timer" parent="."]
+wait_time = 4.0
+one_shot = true
+autostart = true
+
+[node name="LoadTimer" type="Timer" parent="."]
+wait_time = 4.0
+one_shot = true
+[connection signal="timeout" from="SaveTimer" to="." method="_on_SaveTimer_timeout"]
+[connection signal="timeout" from="LoadTimer" to="." method="_on_LoadTimer_timeout"]
