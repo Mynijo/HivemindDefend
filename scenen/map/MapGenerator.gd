@@ -60,14 +60,7 @@ func generate_map(map_generation_file_path : String) -> Dictionary:
     var num_floors : int
     var current_floor = 0
     var scene_map : Dictionary
-    var scene_bbox : AABB
-    var bbox_position : Vector3
-    var bbox_max_size : Vector3
-    var bbox_size : Vector3
-    var min_spawn_point : Vector3
-    var max_spawn_point : Vector3
     var bbox : AABB
-    var start_point : Vector3
     var free_points : Array
     var num_special_blocks : int
     var node : Dictionary
@@ -75,31 +68,9 @@ func generate_map(map_generation_file_path : String) -> Dictionary:
         num_floors = self._roll_range(map_area.get("floor_range", Vector2(1, 1)))
         bbox = AABB(Vector3(1, current_floor, 1), Vector3(map_size.x, num_floors, map_size.y))  # Total current box
         for scene in map_area.get("map_scenes", []):
-            scene_map = self._load_scene(scene["path"])
-            scene_bbox = self._get_bbox(scene_map)
-            bbox_max_size = bbox.size - scene_bbox.size
-            if bbox_max_size.x <= 0 or bbox_max_size.y <= 0 or bbox_max_size.z <= 0:
-                print("Cannot put scene into map, insufficient space.")
-                continue
-            min_spawn_point = scene["spawn_pos_range_min"]
-            min_spawn_point = Vector3( \
-                fposmod(min_spawn_point.x, bbox_max_size.x), \
-                fposmod(min_spawn_point.y, bbox_max_size.y), \
-                fposmod(min_spawn_point.z, bbox_max_size.z) \
-                )
-            max_spawn_point = scene["spawn_pos_range_max"]
-            max_spawn_point = Vector3( \
-                fposmod(max_spawn_point.x, bbox_max_size.x), \
-                fposmod(max_spawn_point.y, bbox_max_size.y), \
-                fposmod(max_spawn_point.z, bbox_max_size.z) \
-                )
-            print(min_spawn_point, max_spawn_point)
-            bbox_position = bbox.position - scene_bbox.position + min_spawn_point
-            bbox_size = max_spawn_point - min_spawn_point
-            bbox_size = Vector3(max(bbox_size.x, 0), max(bbox_size.y, 0), max(bbox_size.z, 0))
-            start_point = self._get_random_point_in_box(AABB(bbox_position, bbox_size))
+            scene_map = self._put_scene_into_bbox(scene, bbox)
             for vindex in scene_map:
-                special_map_nodes[vindex + start_point] = scene_map[vindex]
+                special_map_nodes[vindex] = scene_map[vindex]
         free_points = self._get_all_points_in_bbox(bbox, special_map_nodes.keys())
         free_points.shuffle()
         for special_blocks in map_area.get("special_blocks", []):
@@ -131,6 +102,44 @@ func generate_map(map_generation_file_path : String) -> Dictionary:
         current_floor += num_floors
     #print(start_point, bbox.position, bbox.end, bbox.size, bbox.has_no_area(), bbox.has_no_surface())
     return map_nodes
+
+
+func _put_scene_into_bbox(scene : Dictionary, bbox : AABB):
+    var scene_map : Dictionary
+    var scene_bbox : AABB
+    var bbox_position : Vector3
+    var bbox_max_size : Vector3
+    var bbox_size : Vector3
+    var min_spawn_point : Vector3
+    var max_spawn_point : Vector3
+    var start_point : Vector3
+    var new_scene_map : Dictionary = {}
+    scene_map = self._load_scene(scene["path"])
+    scene_bbox = self._get_bbox(scene_map)
+    bbox_max_size = bbox.size - scene_bbox.size
+    if bbox_max_size.x <= 0 or bbox_max_size.y <= 0 or bbox_max_size.z <= 0:
+        print("Cannot put scene into map, insufficient space.")
+        return new_scene_map
+    min_spawn_point = scene["spawn_pos_range_min"]
+    min_spawn_point = Vector3( \
+        fposmod(min_spawn_point.x, bbox_max_size.x), \
+        fposmod(min_spawn_point.y, bbox_max_size.y), \
+        fposmod(min_spawn_point.z, bbox_max_size.z) \
+        )
+    max_spawn_point = scene["spawn_pos_range_max"]
+    max_spawn_point = Vector3( \
+        fposmod(max_spawn_point.x, bbox_max_size.x), \
+        fposmod(max_spawn_point.y, bbox_max_size.y), \
+        fposmod(max_spawn_point.z, bbox_max_size.z) \
+        )
+    print(min_spawn_point, max_spawn_point)
+    bbox_position = bbox.position - scene_bbox.position + min_spawn_point
+    bbox_size = max_spawn_point - min_spawn_point
+    bbox_size = Vector3(max(bbox_size.x, 0), max(bbox_size.y, 0), max(bbox_size.z, 0))
+    start_point = self._get_random_point_in_box(AABB(bbox_position, bbox_size))
+    for vindex in scene_map:
+        new_scene_map[vindex + start_point] = scene_map[vindex]
+    return new_scene_map
 
 
 func _roll_range(range_vector : Vector2):
