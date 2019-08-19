@@ -26,27 +26,28 @@ const TOP_AIR_BORDER : Dictionary = {
     default_block = BLOCK_TOP_AIR
     }
 
-var default_map_area : Dictionary = {
-    name = "new_area",
-    floor_range = Vector2(5, 5),
-    rolled_floor_range = -1,
-    default_block  = DEFAULT_BLOCK,
-    special_blocks = [],
-    map_scenes = []
-   }
-
-var default_special_block : Dictionary = {
-    block = "",
-    spawn_chance = 0,
-    spawn_range = Vector2(0, 0), # -1 = no limit
-    rolled_spawn_range = -1
+const DEFAULT_CONTENTS : Dictionary = {
+    map_area = {
+        name = "New Area",
+        floor_range = Vector2(5, 5),
+        rolled_floor_range = -1,
+        default_block  = DEFAULT_BLOCK,
+        special_blocks = [],
+        map_scenes = []
+        },
+    special_block = {
+        block = DEFAULT_BLOCK,
+        spawn_chance = 0,
+        spawn_range = Vector2(0, 0), # -1 = no limit
+        rolled_spawn_range = -1
+        },
+    map_scene = {
+        path = "",
+        rotation_range = Vector2(0, 0),
+        spawn_pos_range_min = Vector3(0, 0, 0),    # ( 0, 0, 0) = dont care
+        spawn_pos_range_max = Vector3(-1, -1, -1)  # (-1,-1,-1) = dont care
+        }
     }
-
-var default_map_scene : Dictionary = {
-    path = "",
-    spawn_pos_range_min = Vector3(0, 0, 0),    # ( 0, 0, 0) = dont care
-    spawn_pos_range_max = Vector3(-1, -1, -1)  # (-1,-1,-1) = dont care
-   }
 
 
 func generate_map(map_generation_file_path : String) -> Dictionary:
@@ -234,9 +235,11 @@ func _load_scene(var path) -> Dictionary:
 
 func _load_config(var path) -> Dictionary:
     var loaded_config = self.load_json(path)
+    var map_name = self.default_map_name
+    var map_size = self.default_map_size
     var config = {
-        name = self.default_map_name,
-        map_size = self.default_map_size,
+        name = map_name,
+        map_size = map_size,
         map_areas = []
        }
     self._integrate_dictionary(loaded_config, config)
@@ -256,9 +259,9 @@ func _integrate_dictionary(source : Dictionary, target : Dictionary):
         elif typeof(target[key]) == TYPE_VECTOR3:
             target[key] = Vector3(source_value[0], source_value[1], source_value[2])
         elif typeof(target[key]) == TYPE_ARRAY:
-            default_dict_name = "default_" + key.substr(0, key.length() - 1)
+            default_dict_name = key.substr(0, key.length() - 1)
             for source_item in source_value:
-                new_item = self.get(default_dict_name).duplicate(true)
+                new_item = self.DEFAULT_CONTENTS.get(default_dict_name).duplicate(true)
                 self._integrate_dictionary(source_item, new_item)
                 target[key].append(new_item)
         else:
