@@ -76,21 +76,21 @@ func generate_map(map_generation_file_path : String) -> Dictionary:
         for scene in map_area.get("map_scenes", []):
             scene_map = self._load_scene(scene["path"])
             scene_bbox = self._get_bbox(scene_map)
-            bbox_max_size = Vector3(map_size.x - 1, num_floors - 1, map_size.y - 1) - scene_bbox.size
-            if bbox_max_size.x < 0 or bbox_max_size.y < 0 or bbox_max_size.z < 0:
+            bbox_max_size = Vector3(map_size.x, num_floors, map_size.y) - scene_bbox.size
+            if bbox_max_size.x <= 0 or bbox_max_size.y <= 0 or bbox_max_size.z <= 0:
                 print("Cannot put scene into map, insufficient space.")
                 continue
             min_spawn_point = scene["spawn_pos_range_min"]
             min_spawn_point = Vector3( \
-                fposmod(min_spawn_point.x, bbox_max_size.x + 1), \
-                fposmod(min_spawn_point.y, bbox_max_size.y + 1), \
-                fposmod(min_spawn_point.z, bbox_max_size.z + 1) \
+                fposmod(min_spawn_point.x, bbox_max_size.x), \
+                fposmod(min_spawn_point.y, bbox_max_size.y), \
+                fposmod(min_spawn_point.z, bbox_max_size.z) \
                 )
             max_spawn_point = scene["spawn_pos_range_max"]
             max_spawn_point = Vector3( \
-                fposmod(max_spawn_point.x, bbox_max_size.x + 1), \
-                fposmod(max_spawn_point.y, bbox_max_size.y + 1), \
-                fposmod(max_spawn_point.z, bbox_max_size.z + 1) \
+                fposmod(max_spawn_point.x, bbox_max_size.x), \
+                fposmod(max_spawn_point.y, bbox_max_size.y), \
+                fposmod(max_spawn_point.z, bbox_max_size.z) \
                 )
             print(min_spawn_point, max_spawn_point)
             bbox_position = Vector3(1, current_floor, 1) - scene_bbox.position + min_spawn_point
