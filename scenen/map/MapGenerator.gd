@@ -73,10 +73,11 @@ func generate_map(map_generation_file_path : String) -> Dictionary:
     var node : Dictionary
     for map_area in [TOP_AIR_BORDER] + config["map_areas"] + [BOTTOM_BORDER]:
         num_floors = self._roll_range(map_area.get("floor_range", Vector2(1, 1)))
+        bbox = AABB(Vector3(1, current_floor, 1), Vector3(map_size.x, num_floors, map_size.y))  # Total current box
         for scene in map_area.get("map_scenes", []):
             scene_map = self._load_scene(scene["path"])
             scene_bbox = self._get_bbox(scene_map)
-            bbox_max_size = Vector3(map_size.x, num_floors, map_size.y) - scene_bbox.size
+            bbox_max_size = bbox.size - scene_bbox.size
             if bbox_max_size.x <= 0 or bbox_max_size.y <= 0 or bbox_max_size.z <= 0:
                 print("Cannot put scene into map, insufficient space.")
                 continue
@@ -93,14 +94,12 @@ func generate_map(map_generation_file_path : String) -> Dictionary:
                 fposmod(max_spawn_point.z, bbox_max_size.z) \
                 )
             print(min_spawn_point, max_spawn_point)
-            bbox_position = Vector3(1, current_floor, 1) - scene_bbox.position + min_spawn_point
+            bbox_position = bbox.position - scene_bbox.position + min_spawn_point
             bbox_size = max_spawn_point - min_spawn_point
             bbox_size = Vector3(max(bbox_size.x, 0), max(bbox_size.y, 0), max(bbox_size.z, 0))
-            bbox = AABB(bbox_position, bbox_size)
-            start_point = self._get_random_point_in_box(bbox)
+            start_point = self._get_random_point_in_box(AABB(bbox_position, bbox_size))
             for vindex in scene_map:
                 special_map_nodes[vindex + start_point] = scene_map[vindex]
-        bbox = AABB(Vector3(1, current_floor, 1), Vector3(map_size.x, num_floors, map_size.y))  # Total current box
         free_points = self._get_all_points_in_bbox(bbox, special_map_nodes.keys())
         free_points.shuffle()
         for special_blocks in map_area.get("special_blocks", []):
