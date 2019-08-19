@@ -104,7 +104,9 @@ func generate_map(map_generation_file_path : String) -> Dictionary:
         free_points = self._get_all_points_in_bbox(bbox, special_map_nodes.keys())
         free_points.shuffle()
         for special_blocks in map_area.get("special_blocks", []):
-            num_special_blocks = self._roll_range(special_blocks.get("spawn_range", Vector2(0, 0)))
+            num_special_blocks = 0
+            for i in range(num_floors):
+                num_special_blocks += self._roll_range(special_blocks.get("spawn_range", Vector2(0, 0)))
             block = special_blocks["block"]
             node = {
                 active = false,
