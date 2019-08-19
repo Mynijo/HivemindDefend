@@ -27,8 +27,7 @@ func gen_map_with_file(var map_generation_file_path = "res://scenen/map/map_gene
     self.map_nodes = $MapGenerator.generate_map(map_generation_file_path)
     self._draw_grid_map()
     self._make_floors()
-    var top_floor = self.map_floors.keys().max()
-    activate_nodes(self.map_floors[top_floor][0])  # The first block from the top floor
+    activate_nodes(self.map_floors[0][0])  # The first block from the top floor
 
 
 func _draw_grid_map(nodes_array = null):
@@ -45,7 +44,7 @@ func _draw_grid_map(nodes_array = null):
             grid_id = self.get_block(node["block"])["block_id"]
         else:
             grid_id = unknown_id
-        $GridMap.set_cell_item(vindex.x, vindex.y, vindex.z, grid_id)
+        $GridMap.set_cell_item(vindex.x, -vindex.y, vindex.z, grid_id)  # The grid is drawn from top to bottom
 
 
 func _make_floors():
@@ -68,7 +67,7 @@ func hide_floor(floor_id : int):
     var floor_cells = self.map_floors.get(floor_id)
     if floor_cells:
         for vindex in floor_cells:
-            $GridMap.set_cell_item(vindex.x, vindex.y, vindex.z, -1)
+            $GridMap.set_cell_item(vindex.x, -vindex.y, vindex.z, -1)
     else:
         print("Floor ", floor_id, " was empty!")
 
@@ -94,7 +93,7 @@ func _activate_node(pos : Vector3) -> bool:
     if not node or node["active"]:
         return false
     var block = self.get_block(node["block"])
-    $GridMap.set_cell_item(pos.x, pos.y, pos.z, block["block_id"])
+    $GridMap.set_cell_item(pos.x, -pos.y, pos.z, block["block_id"])
     node["active"] = true
     return true
 

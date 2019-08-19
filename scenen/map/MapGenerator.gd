@@ -70,7 +70,7 @@ func generate_map(map_generation_file_path : String) -> Dictionary:
     var free_points : Array
     var num_special_blocks : int
     var node : Dictionary
-    for map_area in [BOTTOM_BORDER] + config["map_areas"] + [TOP_AIR_BORDER]:
+    for map_area in [TOP_AIR_BORDER] + config["map_areas"] + [BOTTOM_BORDER]:
         num_floors = self._roll_range(map_area.get("floor_range", Vector2(1, 1)))
         for scene in map_area.get("map_scenes", []):
             scene_map = self._load_scene(scene["path"])
@@ -223,6 +223,7 @@ func _load_scene(var path) -> Dictionary:
     for vindex in grid_map.get_used_cells():
         block_id = grid_map.get_cell_item(vindex.x, vindex.y, vindex.z)
         block = grid_map.mesh_library.get_item_name(block_id)
+        vindex *= Vector3(1, -1, 1)  # Since maps are drawn on the reverse y axis, scenes have to be reversed also
         scene_map[vindex] = {
             block = block,
             active = false

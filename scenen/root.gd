@@ -27,15 +27,15 @@ func _on_LoadTimer_timeout():
     get_tree().get_root().print_stray_nodes()
 
 
-var current_floor = 20
-var floor_mod = -1
+var current_floor = 0
+var floor_mod = 1
 func _on_HideTimer_timeout():
-    if current_floor <= 10 :
-        floor_mod = 1
-    elif current_floor > 20:
+    if current_floor >= 10 :
+        floor_mod = -1
+    elif current_floor < 0:
         $HideTimer.stop()
         return
-    if floor_mod < 0:
+    if floor_mod > 0:
         #print("Hiding floor ", current_floor)
         $Map.hide_floor(current_floor)
     else:
