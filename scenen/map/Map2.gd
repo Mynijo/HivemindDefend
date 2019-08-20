@@ -21,6 +21,7 @@ const BLOCK_UNKNOWN = "Unknown"
 #class MapNode:
 #    var active = false
 #    var block = "Unknown"
+#    var rotatable = false
 
 
 func gen_map_with_file(var map_generation_file_path = "res://scenen/map/map_generation_config2.json"):
@@ -33,6 +34,7 @@ func gen_map_with_file(var map_generation_file_path = "res://scenen/map/map_gene
 func _draw_grid_map(nodes_array = null):
     var unknown_id = self.get_block(BLOCK_UNKNOWN)["block_id"]
     var grid_id : int
+    var rot_id : int
     var node : Dictionary
     if not nodes_array:
         # (Re)drawing the whole map
@@ -44,7 +46,8 @@ func _draw_grid_map(nodes_array = null):
             grid_id = self.get_block(node["block"])["block_id"]
         else:
             grid_id = unknown_id
-        $GridMap.set_cell_item(vindex.x, -vindex.y, vindex.z, grid_id)  # The grid is drawn from top to bottom
+        rot_id = node.get("rotation", 0)
+        $GridMap.set_cell_item(vindex.x, -vindex.y, vindex.z, grid_id, rot_id)  # The grid is drawn from top to bottom
 
 
 func _make_floors():
@@ -93,7 +96,8 @@ func _activate_node(pos : Vector3) -> bool:
     if not node or node["active"]:
         return false
     var block = self.get_block(node["block"])
-    $GridMap.set_cell_item(pos.x, -pos.y, pos.z, block["block_id"])
+    var rot_id = node.get("rotation", 0)
+    $GridMap.set_cell_item(pos.x, -pos.y, pos.z, block["block_id"], rot_id)
     node["active"] = true
     return true
 
@@ -112,9 +116,17 @@ func get_block(block_name):
     if not block_name in self.map_blocks:
         var block_id = $GridMap.mesh_library.find_item_by_name(block_name)
         var block_mesh = $GridMap.mesh_library.get_item_mesh(block_id)
+        var transparent = false
+        var rotatable = false
+        if block_mesh.is_class("CubeMesh"):
+            transparent = block_mesh.material.flags_transparent
+        elif block_name == "PlasticRamp":
+            transparent = true
+            rotatable = true
         self.map_blocks[block_name] = {
             "block_id": block_id,
-            "transparent": block_mesh.material.flags_transparent
+            "transparent": transparent,
+            "rotatable": rotatable
             }
     return self.map_blocks[block_name]
 

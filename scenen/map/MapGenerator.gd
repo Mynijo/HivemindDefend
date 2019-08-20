@@ -117,6 +117,8 @@ func _put_scene_into_bbox(scene : Dictionary, bbox : AABB):
     var start_point : Vector3
     var new_vindex : Vector3
     var new_scene_map : Dictionary = {}
+    var node : Dictionary
+    var rotation_id : int
 
     scene_map = self._load_scene(scene["path"])
     scene_bbox = self._get_bbox(scene_map)
@@ -124,12 +126,16 @@ func _put_scene_into_bbox(scene : Dictionary, bbox : AABB):
     scene_rotation = Transform().rotated(Vector3(0, 1, 0), rotation_range * PI / 2).orthonormalized()
     if rotation_range == 0:
         bbox_translation = (bbox.position + bbox.size) * Vector3(0, 0, 0)
+        rotation_id = 0
     elif rotation_range == 1:
         bbox_translation = (bbox.position + bbox.size) * Vector3(0, 0, 1)
+        rotation_id = 16
     elif rotation_range == 2:
         bbox_translation = (bbox.position + bbox.size) * Vector3(1, 0, 1)
+        rotation_id = 10
     elif rotation_range == 3:
         bbox_translation = (bbox.position + bbox.size) * Vector3(1, 0, 0)
+        rotation_id = 22
     bbox_max_size = scene_rotation.xform(bbox).size.round() - scene_bbox.size
     if bbox_max_size.x <= 0 or bbox_max_size.y <= 0 or bbox_max_size.z <= 0:
         print("Cannot put scene into map, insufficient space.")
@@ -154,7 +160,9 @@ func _put_scene_into_bbox(scene : Dictionary, bbox : AABB):
     print((scene_rotation.xform(start_point) + bbox_translation).round())
     for vindex in scene_map:
         new_vindex = (scene_rotation.xform(vindex + start_point) + bbox_translation).round()
-        new_scene_map[new_vindex] = scene_map[vindex]
+        node = scene_map[vindex]
+        node["rotation"] = rotation_id
+        new_scene_map[new_vindex] = node
         #print(vindex, ' -> ', new_vindex, ' (', scene_map[vindex], ')')
     return new_scene_map
 
