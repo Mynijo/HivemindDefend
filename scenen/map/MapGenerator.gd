@@ -108,7 +108,7 @@ func _put_scene_into_bbox(scene : Dictionary, bbox : AABB):
     var scene_bbox : AABB
     var scene_rotation : Transform
     var rotation_range : int
-    var bbox_xz_midpoint : Vector3 = (bbox.position + bbox.size) * Vector3(.5, 0, .5)
+    var bbox_translation : Vector3
     var bbox_position : Vector3
     var bbox_max_size : Vector3
     var bbox_size : Vector3
@@ -122,7 +122,15 @@ func _put_scene_into_bbox(scene : Dictionary, bbox : AABB):
     scene_bbox = self._get_bbox(scene_map)
     rotation_range = self._roll_range(scene.get("rotation_range", Vector2(0, 0))) % 4
     scene_rotation = Transform().rotated(Vector3(0, 1, 0), rotation_range * PI / 2).orthonormalized()
-    bbox_max_size = bbox.size - scene_bbox.size
+    if rotation_range == 0:
+        bbox_translation = (bbox.position + bbox.size) * Vector3(0, 0, 0)
+    elif rotation_range == 1:
+        bbox_translation = (bbox.position + bbox.size) * Vector3(0, 0, 1)
+    elif rotation_range == 2:
+        bbox_translation = (bbox.position + bbox.size) * Vector3(1, 0, 1)
+    elif rotation_range == 3:
+        bbox_translation = (bbox.position + bbox.size) * Vector3(1, 0, 0)
+    bbox_max_size = scene_rotation.xform(bbox).size.round() - scene_bbox.size
     if bbox_max_size.x <= 0 or bbox_max_size.y <= 0 or bbox_max_size.z <= 0:
         print("Cannot put scene into map, insufficient space.")
         return new_scene_map
@@ -138,13 +146,14 @@ func _put_scene_into_bbox(scene : Dictionary, bbox : AABB):
         fposmod(max_spawn_point.y, bbox_max_size.y), \
         fposmod(max_spawn_point.z, bbox_max_size.z) \
         )
-    print(min_spawn_point, max_spawn_point)
     bbox_position = bbox.position - scene_bbox.position + min_spawn_point
     bbox_size = max_spawn_point - min_spawn_point
+    print(min_spawn_point, max_spawn_point, bbox_position, bbox_size)
     bbox_size = Vector3(max(bbox_size.x, 0), max(bbox_size.y, 0), max(bbox_size.z, 0))
     start_point = self._get_random_point_in_box(AABB(bbox_position, bbox_size))
+    print((scene_rotation.xform(start_point) + bbox_translation).round())
     for vindex in scene_map:
-        new_vindex = (scene_rotation.xform(vindex + start_point - bbox_xz_midpoint) + bbox_xz_midpoint).round()
+        new_vindex = (scene_rotation.xform(vindex + start_point) + bbox_translation).round()
         new_scene_map[new_vindex] = scene_map[vindex]
         #print(vindex, ' -> ', new_vindex, ' (', scene_map[vindex], ')')
     return new_scene_map

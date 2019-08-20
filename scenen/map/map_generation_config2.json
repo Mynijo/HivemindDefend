@@ -1,6 +1,6 @@
 {
 	"name" : "First Map Config",
-	"map_size" : [20,20],
+	"map_size" : [20,10],
 	"map_areas" :
 	[
 		{
