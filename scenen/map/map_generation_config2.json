@@ -1,0 +1,27 @@
+{
+	"name" : "First Map Config",
+	"map_size" : [20,20],
+	"map_areas" :
+	[
+		{
+			"name" : "Ground Area",
+			"floor_range" : [20,20],
+			"default_block" : "Dirt",
+			"special_blocks" :
+			[
+				{
+					"block" : "CopperOre",
+					"spawn_range" : [0,0]
+				}
+			],
+			"map_scenes" :
+			[
+				{
+					"path" : "res://scenen/map/map_scene/StartPoint2.tscn",
+					"spawn_pos_range_min" : [0,-1,0],
+					"spawn_pos_range_max" : [-1,-1,-1]
+				}
+			]
+		}
+	]
+}
