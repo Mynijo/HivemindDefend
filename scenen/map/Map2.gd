@@ -22,42 +22,59 @@ const BLOCK_UNKNOWN = "Unknown"
 #    var active = false
 #    var block = "Unknown"
 
-func _init():
-    pass
-
-func _ready():
-    pass
 
 func gen_map_with_file(var map_generation_file_path = "res://scenen/map/map_generation_config2.json"):
-    self.map_nodes = $MapGenerator.generate_map(map_generation_file_path, $GridMap.mesh_library)
+    self.map_nodes = $MapGenerator.generate_map(map_generation_file_path)
     self._draw_grid_map()
     self._make_floors()
     var top_floor = self.map_floors.keys().max()
     activate_nodes(self.map_floors[top_floor][0])  # The first block from the top floor
 
 
-func _draw_grid_map():
-    $GridMap.clear()
+func _draw_grid_map(nodes_array = null):
     var unknown_id = self.get_block(BLOCK_UNKNOWN)["block_id"]
     var grid_id : int
     var node : Dictionary
-    for vindex in self.map_nodes:
+    if not nodes_array:
+        # (Re)drawing the whole map
+        $GridMap.clear()
+        nodes_array = self.map_nodes
+    for vindex in nodes_array:
         node = self.map_nodes[vindex]
         if node["active"]:
             grid_id = self.get_block(node["block"])["block_id"]
         else:
             grid_id = unknown_id
-        $GridMap.set_cell_item(node.x, node.y, node.z, grid_id)
+        $GridMap.set_cell_item(vindex.x, vindex.y, vindex.z, grid_id)
+
 
 func _make_floors():
     for vindex in self.map_nodes:
-        var node_floor = vindex.y
+        var node_floor = int(vindex.y)
         if not self.map_floors.has(node_floor):
             self.map_floors[node_floor] = []
         self.map_floors[node_floor].append(vindex)
 
 
+func show_floor(floor_id : int):
+    var floor_cells = self.map_floors.get(floor_id)
+    if floor_cells:
+        self._draw_grid_map(floor_cells)
+    else:
+        print("Floor ", floor_id, " was empty!")
+
+
+func hide_floor(floor_id : int):
+    var floor_cells = self.map_floors.get(floor_id)
+    if floor_cells:
+        for vindex in floor_cells:
+            $GridMap.set_cell_item(vindex.x, vindex.y, vindex.z, -1)
+    else:
+        print("Floor ", floor_id, " was empty!")
+
+
 func activate_nodes(pos : Vector3):
+    var appended_nodes_num = 0
     var activated : bool = self._activate_node(pos)
     var queue := []
     if self._node_is_transparent(pos):
@@ -68,6 +85,8 @@ func activate_nodes(pos : Vector3):
             activated = self._activate_node(pos + direction)
             if activated and self._node_is_transparent(pos + direction):
                 queue.append(pos + direction)
+                appended_nodes_num += 1
+    print("Activated the chain ", appended_nodes_num, " times.")
 
 
 func _activate_node(pos : Vector3) -> bool:
@@ -100,6 +119,7 @@ func get_block(block_name):
             }
     return self.map_blocks[block_name]
 
+
 func get_map_node(position : Vector3) -> Dictionary:
     return self.map_nodes.get(position, null)
 
@@ -114,8 +134,9 @@ func save() -> Dictionary:
         "map_nodes" : map_node_dict
     }
     var save_map_dict : Dictionary = {
-        "filename" : get_filename(),
-        "parent" : get_parent().get_path(),
+        #"filename" : get_filename(),
+        #"parent" : get_parent().get_path(),
+        "path": self.get_path(),
         "data": save_node_dict
     }
     return save_map_dict

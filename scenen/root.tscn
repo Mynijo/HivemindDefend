@@ -2,7 +2,7 @@
 
 [ext_resource path="res://scenen/root.gd" type="Script" id=1]
 [ext_resource path="res://scenen/CamBase.gd" type="Script" id=2]
-[ext_resource path="res://scenen/map/map.tscn" type="PackedScene" id=3]
+[ext_resource path="res://scenen/map/Map2.tscn" type="PackedScene" id=3]
 
 [node name="root" type="Node"]
 script = ExtResource( 1 )
@@ -21,12 +21,16 @@ transform = Transform( 0.939693, -0.321394, 0.116978, 0, 0.34202, 0.939693, -0.3
 [node name="Map" parent="." instance=ExtResource( 3 )]
 
 [node name="SaveTimer" type="Timer" parent="."]
-wait_time = 4.0
+wait_time = 10.0
 one_shot = true
 autostart = true
 
 [node name="LoadTimer" type="Timer" parent="."]
 wait_time = 4.0
 one_shot = true
+
+[node name="HideTimer" type="Timer" parent="."]
+wait_time = 0.2
 [connection signal="timeout" from="SaveTimer" to="." method="_on_SaveTimer_timeout"]
 [connection signal="timeout" from="LoadTimer" to="." method="_on_LoadTimer_timeout"]
+[connection signal="timeout" from="HideTimer" to="." method="_on_HideTimer_timeout"]
