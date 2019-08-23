@@ -45,6 +45,12 @@
 					"rotation_range" : [3,3],
 					"spawn_pos_range_min" : [9,0,8],
 					"spawn_pos_range_max" : [9,0,8]
+				},
+				{
+					"path" : "res://scenen/map/map_scene/RampCrossUp.tscn",
+					"rotation_range" : [0,1],
+					"spawn_pos_range_min" : [0,0,0],
+					"spawn_pos_range_max" : [-1,0,-1]
 				}
 			]
 		}

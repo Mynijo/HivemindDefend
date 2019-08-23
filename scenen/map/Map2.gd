@@ -34,7 +34,7 @@ func gen_map_with_file(var map_generation_file_path = "res://scenen/map/map_gene
 func _draw_grid_map(nodes_array = null):
     var unknown_id = self.get_block(BLOCK_UNKNOWN)["block_id"]
     var grid_id : int
-    var rot_id : int
+    var orientation_id : int
     var node : Dictionary
     if not nodes_array:
         # (Re)drawing the whole map
@@ -46,8 +46,8 @@ func _draw_grid_map(nodes_array = null):
             grid_id = self.get_block(node["block"])["block_id"]
         else:
             grid_id = unknown_id
-        rot_id = node.get("rotation", 0)
-        $GridMap.set_cell_item(vindex.x, -vindex.y, vindex.z, grid_id, rot_id)  # The grid is drawn from top to bottom
+        orientation_id = node.get("orientation", 0)
+        $GridMap.set_cell_item(vindex.x, -vindex.y, vindex.z, grid_id, orientation_id)  # The grid is drawn from top to bottom
 
 
 func _make_floors():
@@ -96,8 +96,8 @@ func _activate_node(pos : Vector3) -> bool:
     if not node or node["active"]:
         return false
     var block = self.get_block(node["block"])
-    var rot_id = node.get("rotation", 0)
-    $GridMap.set_cell_item(pos.x, -pos.y, pos.z, block["block_id"], rot_id)
+    var orientation_id = node.get("orientation", 0)
+    $GridMap.set_cell_item(pos.x, -pos.y, pos.z, block["block_id"], orientation_id)
     node["active"] = true
     return true
 

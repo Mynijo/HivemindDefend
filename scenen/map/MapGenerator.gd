@@ -7,6 +7,33 @@ const DEFAULT_BLOCK = "Dirt"
 const BLOCK_BEDROCK = "Bedrock"
 const BLOCK_TOP_AIR = "TopAir"
 
+const ORIENTATION_ARRAY = [
+        Basis(Vector3(1, 0, 0), Vector3(0, 1, 0), Vector3(0, 0, 1)),
+        Basis(Vector3(0, -1, 0), Vector3(1, 0, 0), Vector3(0, 0, 1)),
+        Basis(Vector3(-1, 0, 0), Vector3(0, -1, 0), Vector3(0, 0, 1)),
+        Basis(Vector3(0, 1, 0), Vector3(-1, 0, 0), Vector3(0, 0, 1)),
+        Basis(Vector3(1, 0, 0), Vector3(0, 0, -1), Vector3(0, 1, 0)),
+        Basis(Vector3(0, 0, 1), Vector3(1, 0, 0), Vector3(0, 1, 0)),
+        Basis(Vector3(-1, 0, 0), Vector3(0, 0, 1), Vector3(0, 1, 0)),
+        Basis(Vector3(0, 0, -1), Vector3(-1, 0, 0), Vector3(0, 1, 0)),
+        Basis(Vector3(1, 0, 0), Vector3(0, -1, 0), Vector3(0, 0, -1)),
+        Basis(Vector3(0, 1, 0), Vector3(1, 0, 0), Vector3(0, 0, -1)),
+        Basis(Vector3(-1, 0, 0), Vector3(0, 1, 0), Vector3(0, 0, -1)),
+        Basis(Vector3(0, -1, 0), Vector3(-1, 0, 0), Vector3(0, 0, -1)),
+        Basis(Vector3(1, 0, 0), Vector3(0, 0, 1), Vector3(0, -1, 0)),
+        Basis(Vector3(0, 0, -1), Vector3(1, 0, 0), Vector3(0, -1, 0)),
+        Basis(Vector3(-1, 0, 0), Vector3(0, 0, -1), Vector3(0, -1, 0)),
+        Basis(Vector3(0, 0, 1), Vector3(-1, 0, 0), Vector3(0, -1, 0)),
+        Basis(Vector3(0, 0, 1), Vector3(0, 1, 0), Vector3(-1, 0, 0)),
+        Basis(Vector3(0, -1, 0), Vector3(0, 0, 1), Vector3(-1, 0, 0)),
+        Basis(Vector3(0, 0, -1), Vector3(0, -1, 0), Vector3(-1, 0, 0)),
+        Basis(Vector3(0, 1, 0), Vector3(0, 0, -1), Vector3(-1, 0, 0)),
+        Basis(Vector3(0, 0, 1), Vector3(0, -1, 0), Vector3(1, 0, 0)),
+        Basis(Vector3(0, 1, 0), Vector3(0, 0, 1), Vector3(1, 0, 0)),
+        Basis(Vector3(0, 0, -1), Vector3(0, 1, 0), Vector3(1, 0, 0)),
+        Basis(Vector3(0, -1, 0), Vector3(0, 0, -1), Vector3(1, 0, 0))
+    ]
+
 var rng = RandomNumberGenerator.new()
 
 # Called when the node enters the scene tree for the first time.
@@ -118,7 +145,9 @@ func _put_scene_into_bbox(scene : Dictionary, bbox : AABB):
     var new_vindex : Vector3
     var new_scene_map : Dictionary = {}
     var node : Dictionary
-    var rotation_id : int
+    var orientation_id : int
+    var current_orientation_id : int
+    var current_orientation_trans : Transform
 
     scene_map = self._load_scene(scene["path"])
     scene_bbox = self._get_bbox(scene_map)
@@ -126,16 +155,12 @@ func _put_scene_into_bbox(scene : Dictionary, bbox : AABB):
     scene_rotation = Transform().rotated(Vector3(0, 1, 0), rotation_range * PI / 2).orthonormalized()
     if rotation_range == 0:
         bbox_translation = (bbox.position + bbox.size) * Vector3(0, 0, 0)
-        rotation_id = 0
     elif rotation_range == 1:
         bbox_translation = (bbox.position + bbox.size) * Vector3(0, 0, 1)
-        rotation_id = 16
     elif rotation_range == 2:
         bbox_translation = (bbox.position + bbox.size) * Vector3(1, 0, 1)
-        rotation_id = 10
     elif rotation_range == 3:
         bbox_translation = (bbox.position + bbox.size) * Vector3(1, 0, 0)
-        rotation_id = 22
     bbox_max_size = scene_rotation.xform(bbox).size.round() - scene_bbox.size
     if bbox_max_size.x <= 0 or bbox_max_size.y <= 0 or bbox_max_size.z <= 0:
         print("Cannot put scene into map, insufficient space.")
@@ -161,7 +186,13 @@ func _put_scene_into_bbox(scene : Dictionary, bbox : AABB):
     for vindex in scene_map:
         new_vindex = (scene_rotation.xform(vindex + start_point) + bbox_translation).round()
         node = scene_map[vindex]
-        node["rotation"] = rotation_id
+        current_orientation_id = node.get("orientation", 0)
+        current_orientation_trans = Transform(self.ORIENTATION_ARRAY[current_orientation_id % 24])
+        orientation_id = (scene_rotation * current_orientation_trans).basis.get_orthogonal_index()
+        node["orientation"] = orientation_id
+        if orientation_id == 0:
+            # This is the default, no need to make the Dictionary bigger
+            node.erase("orientation")
         new_scene_map[new_vindex] = node
         #print(vindex, ' -> ', new_vindex, ' (', scene_map[vindex], ')')
     return new_scene_map
@@ -247,6 +278,7 @@ func _load_scene(var path) -> Dictionary:
     var scene = resource_manager.get_resource(path).instance()
     var grid_map : GridMap
     var block_id : int
+    var orientation_id : int
     var block : String
     var scene_map = {}
     if scene.is_class("GridMap"):
@@ -258,12 +290,15 @@ func _load_scene(var path) -> Dictionary:
                 break
     for vindex in grid_map.get_used_cells():
         block_id = grid_map.get_cell_item(vindex.x, vindex.y, vindex.z)
+        orientation_id = grid_map.get_cell_item_orientation(vindex.x, vindex.y, vindex.z)
         block = grid_map.mesh_library.get_item_name(block_id)
         vindex *= Vector3(1, -1, 1)  # Since maps are drawn on the reverse y axis, scenes have to be reversed also
         scene_map[vindex] = {
             block = block,
             active = false
             }
+        if orientation_id != 0:
+            scene_map[vindex]["orientation"] = orientation_id
     scene.queue_free()
     return scene_map
 
