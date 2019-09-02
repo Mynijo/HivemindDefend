@@ -14,17 +14,19 @@ const SOUTH = Vector3(0, 0, 1)
 const UP = Vector3(0, -1, 0)
 const DOWN = Vector3(0, 1, 0)
 
+var max_map_size : Vector3
 
 func _ready():
     a_star_map = AStar.new()
+    self.connect("map_generated", self, "_init_map")
 
 func _input(event):
     if event.is_action_pressed("Debug_input"):
-        init_map(creat_test_map())
+        _init_map(null)
         var test = a_star_map.get_point_path(pos_to_id(Vector3(0,0,0)),pos_to_id(Vector3(7,0,7)))
         pass
 
-func creat_test_map() -> Dictionary:
+func create_test_map() -> Dictionary:
     var temp_map : Dictionary
     temp_map[Vector3(1,0,0)] = 0
     temp_map[Vector3(2,0,0)] = 0
@@ -87,7 +89,15 @@ func creat_test_map() -> Dictionary:
     return temp_map
 
 
-func init_map(var map_dict : Dictionary):
+func _init_map(var map):
+    var map_dict : Dictionary
+    if map == null: #test map
+        map_dict = create_test_map()
+        max_map_size = Vector3(100,100,100)
+    else:
+        map_dict = map.get_active_nods()
+        max_map_size = map.get_size()
+
     a_star_map.clear()
     var i : int = 0
     for key in map_dict:
@@ -137,4 +147,5 @@ func is_node_ramp_connectable(var ramp_dirc, var block_pos_relativ, var same_flo
     return false
 
 func pos_to_id(var pos : Vector3) -> int:
-    return int(pos.x * 100000 + pos.y * 100 + pos.z)
+    #return int(pos.x * 10000000 + pos.y * 1000 + pos.z)
+    return int(pos.x * max_map_size.y * max_map_size.z  + pos.y * max_map_size.z + pos.z)
