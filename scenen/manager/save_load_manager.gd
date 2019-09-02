@@ -1,13 +1,15 @@
 extends Node
 
-var default_save_file = "res://saves/save_file.json"
+const SAVES_DIR = "res://saves"
+const DEFAULT_SAVE_FILE = "savegame.save"
 
 func _ready():
     pass # Replace with function body.
 
-func save_game(Save_file : String = default_save_file ):
+func save_game(save_file : String = DEFAULT_SAVE_FILE):
+    save_file = SAVES_DIR + "/" + save_file
     var save_game = File.new()
-    save_game.open("res://saves/savegame.save", File.WRITE)
+    save_game.open(save_file, File.WRITE)
     var save_nodes = get_tree().get_nodes_in_group("persist")
     var node_data : Array = []
     for i in save_nodes:
@@ -17,14 +19,15 @@ func save_game(Save_file : String = default_save_file ):
     save_game.close()
 
 
-func load_game(Save_file : String = default_save_file ):
+func load_game(save_file : String = DEFAULT_SAVE_FILE):
+    save_file = SAVES_DIR + "/" + save_file
     var save_game = File.new()
-    if not save_game.file_exists("res://saves/savegame.save"):
+    if not save_game.file_exists(save_file):
         return # Error! We don't have a save to load.
 
     # Load the file line by line and process that dictionary to restore
     # the object it represents.
-    save_game.open("res://saves/savegame.save", File.READ)
+    save_game.open(save_file, File.READ)
 
     var parsed_json = parse_json(save_game.get_as_text())
 
