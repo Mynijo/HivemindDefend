@@ -28,6 +28,7 @@ config/icon="res://icon.png"
 
 resource_manager="*res://scenen/manager/resource_manager.gd"
 save_load_manager="*res://scenen/manager/save_load_manager.gd"
+pathfinding_manager="*res://scenen/manager/PathfindingManager.gd"
 
 [input]
 
@@ -91,5 +92,10 @@ floor_up={
 floor_down={
 "deadzone": 0.5,
 "events": [ Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":0,"alt":false,"shift":false,"control":false,"meta":false,"command":false,"pressed":false,"scancode":16777234,"unicode":0,"echo":false,"script":null)
+ ]
+}
+Debug_input={
+"deadzone": 0.5,
+"events": [ Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":0,"alt":false,"shift":false,"control":false,"meta":false,"command":false,"pressed":false,"scancode":88,"unicode":0,"echo":false,"script":null)
  ]
 }
