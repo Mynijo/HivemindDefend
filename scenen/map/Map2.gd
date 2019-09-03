@@ -153,14 +153,14 @@ func _set_connectivity(pos, direction):
             make_astar_connection(pos, pos + direction)
         else:
             # Me or the other block said, that a connection is not possible
-            if self_block["traversable"] and other_block["traversable"]:
-                print('Connection severed: ', pos, ' <-> ', pos + direction)
-                print(self_node["block"], ", ", self_connectivity, ", ", direction, ", ", DIRECTION_MASK[direction], ", ", (1 << DIRECTION_MASK[direction]), ", ", self_connectivity & (1 << DIRECTION_MASK[direction]))
-                print(other_node["block"], ", ", other_connectivity, ", ", -direction, ", ", DIRECTION_MASK[-direction], ", ", (1 << DIRECTION_MASK[-direction]), ", ", other_connectivity & (1 << DIRECTION_MASK[-direction]))
-                if self_block["ramp"]:
-                    print(self.get_node_direction(pos))
-                if other_block["ramp"]:
-                    print(self.get_node_direction(pos + direction))
+            #if self_block["traversable"] and other_block["traversable"]:
+                #print('Connection severed: ', pos, ' <-> ', pos + direction)
+                #print(self_node["block"], ", ", self_connectivity, ", ", direction, ", ", DIRECTION_MASK[direction], ", ", (1 << DIRECTION_MASK[direction]), ", ", self_connectivity & (1 << DIRECTION_MASK[direction]))
+                #print(other_node["block"], ", ", other_connectivity, ", ", -direction, ", ", DIRECTION_MASK[-direction], ", ", (1 << DIRECTION_MASK[-direction]), ", ", other_connectivity & (1 << DIRECTION_MASK[-direction]))
+                #if self_block["ramp"]:
+                #    print(self.get_node_direction(pos))
+                #if other_block["ramp"]:
+                #    print(self.get_node_direction(pos + direction))
             self_connectivity &= ~(1 << DIRECTION_MASK[direction])
             other_connectivity &= ~(1 << DIRECTION_MASK[-direction])
             other_node["connectivity"] = other_connectivity
