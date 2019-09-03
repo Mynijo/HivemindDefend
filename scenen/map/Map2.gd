@@ -9,12 +9,21 @@ var map_nodes := {}
 var map_floors := {}
 var map_blocks : Dictionary
 
+signal map_generated(map)
+
 const EAST = Vector3(1, 0, 0)
 const WEST = Vector3(-1, 0, 0)
 const NORTH = Vector3(0, 0, -1)
 const SOUTH = Vector3(0, 0, 1)
-const UP = Vector3(0, 1, 0)
-const DOWN = Vector3(0, -1, 0)
+const UP = Vector3(0, -1, 0)
+const DOWN = Vector3(0, 1, 0)
+const DIRECTION_MASK = {EAST: 0,
+                        WEST: 1,
+                        NORTH: 2,
+                        SOUTH: 3,
+                        UP: 4,
+                        DOWN: 5}
+const FULL_CONNECTIVITY = (1 << 6) - 1
 
 const BLOCK_UNKNOWN = "Unknown"
 
@@ -28,7 +37,14 @@ func gen_map_with_file(var map_generation_file_path = "res://scenen/map/map_gene
     self.map_nodes = $MapGenerator.generate_map(map_generation_file_path)
     self._draw_grid_map()
     self._make_floors()
+    emit_signal("map_generated", self)
     activate_nodes(self.map_floors[0][0])  # The first block from the top floor
+
+
+func get_size() -> Vector3:
+    if not self.map_nodes:
+        return Vector3(0, 0, 0)
+    return (self.map_nodes.keys().max() - self.map_nodes.keys().min() + Vector3(1, 1, 1))
 
 
 func _draw_grid_map(nodes_array = null):
@@ -79,16 +95,88 @@ func activate_nodes(pos : Vector3):
     var appended_nodes_num = 0
     var activated : bool = self._activate_node(pos)
     var queue := []
+    var connectivity := 0
     if self._node_is_transparent(pos):
         queue.append(pos)
     while queue:
         pos = queue.pop_front()
-        for direction in [EAST, WEST, NORTH, SOUTH, UP, DOWN]:
+        for direction in [UP, DOWN, NORTH, SOUTH, EAST, WEST]:
             activated = self._activate_node(pos + direction)
+            self._set_connectivity(pos, direction)
             if activated and self._node_is_transparent(pos + direction):
                 queue.append(pos + direction)
                 appended_nodes_num += 1
+
     print("Activated the chain ", appended_nodes_num, " times.")
+
+
+func _set_connectivity(pos, direction):
+    var self_node = self.map_nodes.get(pos, null)
+    if not self_node:
+        return
+    var self_connectivity = self_node.get("connectivity", FULL_CONNECTIVITY)
+    var self_block = self.get_block(self_node["block"])
+
+    var other_node = self.map_nodes.get(pos + direction, null)
+    var other_block = null
+    var other_connectivity = null
+    if other_node:
+        other_block = self.get_block(other_node["block"])
+        other_connectivity = other_node.get("connectivity", null)
+
+#    if self_block["traversable"]:
+#        print("_set_connectivity(", pos, ", ", direction, ")")
+
+    if not self_block["traversable"]:
+        self_connectivity = 0
+    elif other_node == null:
+        # Cannot connect to nonexistent block
+        self_connectivity &= ~(1 << DIRECTION_MASK[direction])
+    elif direction == UP and self_block["ramp"]:
+        # Ramps only have two possble valid options
+        self_connectivity &= (1 << DIRECTION_MASK[UP]) + (1 << DIRECTION_MASK[self.get_node_direction(pos)])
+        if not other_block["traversable"] or other_block["ramp"]:
+            self_connectivity &= ~(1 << DIRECTION_MASK[UP])
+    elif direction == UP:
+        # Without a ramp, you cannot go up
+        self_connectivity &= ~(1 << DIRECTION_MASK[UP])
+    elif direction == DOWN and other_block["ramp"]:
+        # There is a ramp below, so only one side option is valid
+        self_connectivity &= (1 << DIRECTION_MASK[DOWN]) + (1 << DIRECTION_MASK[-self.get_node_direction(pos + direction)])
+    elif direction == DOWN and other_block["traversable"] and not self_block["ramp"]:
+        # A block with air below is not connectable
+        self_connectivity = 0
+    elif not other_block["traversable"]:
+        self_connectivity &= ~(1 << DIRECTION_MASK[direction])
+
+    if !(other_connectivity == null):
+        # The other block was nice enough to have their connectivity already calculated, so we are responsible for making the AStar connection
+        if (self_connectivity & (1 << DIRECTION_MASK[direction])) and (other_connectivity & (1 << DIRECTION_MASK[-direction])):
+            make_astar_connection(pos, pos + direction)
+        else:
+            # Me or the other block said, that a connection is not possible
+            if self_block["traversable"] and other_block["traversable"]:
+                print('Connection severed: ', pos, ' <-> ', pos + direction)
+                print(self_node["block"], ", ", self_connectivity, ", ", direction, ", ", DIRECTION_MASK[direction], ", ", (1 << DIRECTION_MASK[direction]), ", ", self_connectivity & (1 << DIRECTION_MASK[direction]))
+                print(other_node["block"], ", ", other_connectivity, ", ", -direction, ", ", DIRECTION_MASK[-direction], ", ", (1 << DIRECTION_MASK[-direction]), ", ", other_connectivity & (1 << DIRECTION_MASK[-direction]))
+                if self_block["ramp"]:
+                    print(self.get_node_direction(pos))
+                if other_block["ramp"]:
+                    print(self.get_node_direction(pos + direction))
+            self_connectivity &= ~(1 << DIRECTION_MASK[direction])
+            other_connectivity &= ~(1 << DIRECTION_MASK[-direction])
+            other_node["connectivity"] = other_connectivity
+
+    self_node["connectivity"] = self_connectivity
+#    if self_block["traversable"] and other_block["traversable"]:
+#        print(self.map_nodes[pos], ', ', other_node)
+#        print("connectivity: ", self_connectivity, " - ", other_connectivity)
+#        if other_connectivity != null:
+#            print("connectivity: ", (self_connectivity & (1 << DIRECTION_MASK[direction])), " - ", (other_connectivity & (1 << DIRECTION_MASK[-direction])))
+
+
+func make_astar_connection(a, b):
+    print('Connection created: ', a, ' <-> ', b)
 
 
 func _activate_node(pos : Vector3) -> bool:
@@ -112,21 +200,36 @@ func _node_is_transparent(pos : Vector3) -> bool:
     return block["transparent"] as bool
 
 
+func get_node_direction(pos : Vector3) -> Vector3:
+    var node = self.map_nodes.get(pos, null)
+    if not node:
+        return Vector3(0, 0, 0)
+    return $MapGenerator.ORIENTATION_ARRAY[node.get("orientation", 0) % 24].xform_inv(Vector3(1, 0, 0))
+
+
 func get_block(block_name):
     if not block_name in self.map_blocks:
         var block_id = $GridMap.mesh_library.find_item_by_name(block_name)
         var block_mesh = $GridMap.mesh_library.get_item_mesh(block_id)
         var transparent = false
         var rotatable = false
+        var traversable = false
+        var ramp = false
         if block_mesh.is_class("CubeMesh"):
             transparent = block_mesh.material.flags_transparent
+            if transparent and block_name != "TopAir":
+                traversable = true
         elif block_name == "PlasticRamp":
             transparent = true
             rotatable = true
+            traversable = true
+            ramp = true
         self.map_blocks[block_name] = {
             "block_id": block_id,
             "transparent": transparent,
-            "rotatable": rotatable
+            "rotatable": rotatable,
+            "traversable": traversable,
+            "ramp": ramp
             }
     return self.map_blocks[block_name]
 
