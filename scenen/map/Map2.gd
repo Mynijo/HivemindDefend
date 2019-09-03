@@ -9,8 +9,6 @@ var map_nodes := {}
 var map_floors := {}
 var map_blocks : Dictionary
 
-signal map_generated(map)
-
 const EAST = Vector3(1, 0, 0)
 const WEST = Vector3(-1, 0, 0)
 const NORTH = Vector3(0, 0, -1)
@@ -177,6 +175,7 @@ func _set_connectivity(pos, direction):
 
 func make_astar_connection(a, b):
     print('Connection created: ', a, ' <-> ', b)
+    pathfinding_manager.connect_nodes(a,b)
 
 
 func _activate_node(pos : Vector3) -> bool:
