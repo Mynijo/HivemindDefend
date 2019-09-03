@@ -6,6 +6,7 @@ var max_map_size : Vector3
 
 func _init():
     a_star_map = AStar.new()
+    max_map_size = Vector3(1000,1000,1000)
 
 func _input(event):
     if event.is_action_pressed("Debug_input"):
