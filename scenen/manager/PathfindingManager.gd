@@ -22,15 +22,17 @@ func pos_to_id(var pos : Vector3) -> int:
 func get_node_path(startNode : Vector3, endNode2 : Vector3) -> PoolVector3Array:
     return a_star_map.get_point_path(pos_to_id(startNode),pos_to_id(endNode2))
 
+func del_nodes(node : Vector3):
+    a_star_map.remove_point(pos_to_id(node))
 
-func connect_nodes(node : Vector3, node2 : Vector3):
+func disconnect_nodes(startNode : Vector3, endNode2 : Vector3):
+    a_star_map.disconnect_points(pos_to_id(startNode),pos_to_id(endNode2))
+
+func connect_nodes(node : Vector3, node2 : Vector3, bidirectional : bool = true):
     var nodeId = pos_to_id(node)
     var node2Id =pos_to_id(node2)
-
     if not a_star_map.has_point(nodeId):
         a_star_map.add_point(nodeId, node)
-
     if not a_star_map.has_point(node2Id):
         a_star_map.add_point(node2Id, node2)
-
-    a_star_map.connect_points(nodeId, node2Id)
+    a_star_map.connect_points(nodeId, node2Id, bidirectional)
