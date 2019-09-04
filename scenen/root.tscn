@@ -1,8 +1,9 @@
-[gd_scene load_steps=4 format=2]
+[gd_scene load_steps=5 format=2]
 
 [ext_resource path="res://scenen/root.gd" type="Script" id=1]
 [ext_resource path="res://scenen/CamBase.gd" type="Script" id=2]
 [ext_resource path="res://scenen/map/Map2.tscn" type="PackedScene" id=3]
+[ext_resource path="res://scenen/map/BlockLibrary.tres" type="MeshLibrary" id=4]
 
 [node name="root" type="Node"]
 script = ExtResource( 1 )
@@ -31,6 +32,21 @@ one_shot = true
 
 [node name="HideTimer" type="Timer" parent="."]
 wait_time = 0.2
+
+[node name="GridMap" type="GridMap" parent="."]
+transform = Transform( -4.37114e-008, 0, 1, 0, 1, 0, -1, 0, -4.37114e-008, 0, 0, 0 )
+mesh_library = ExtResource( 4 )
+cell_size = Vector3( 1, 1, 1 )
+cell_center_x = false
+cell_center_y = false
+cell_center_z = false
+data = {
+"cells": PoolIntArray( 1, 0, 2, 1, 1, 536870918, 1, 2, 2, 1, 3, 6, 1, 4, 1, 1, 5, 2, 1, 6, 6, 1, 7, 2, 1, 8, 6, 1, 9, 1048581, 1, 10, 6, 1, 11, 2, 1, 12, 6, 1, 13, 2, 1, 14, 1, 1, 15, 6, 1, 16, 2, 1, 17, 6, 1, 18, 5, 0, 65535, 2, 1, 65535, 1048580, 65516, 65535, 196613, 65517, 65535, 196610, 65518, 65535, 1048582, 65519, 65535, 196610, 65520, 65535, 1048582, 65521, 65535, 1, 65522, 65535, 2, 65523, 65535, 1048582, 65524, 65535, 2, 65525, 65535, 1048582, 65526, 65535, 5, 65527, 65535, 1048582, 65528, 65535, 2, 65529, 65535, 1048582, 65530, 65535, 2, 65531, 65535, 1048582, 65532, 65535, 1, 65533, 65535, 1048582, 65534, 65535, 2, 65535, 65535, 1048582 )
+}
+__meta__ = {
+"_editor_clip_": 0,
+"_editor_floor_": Vector3( 0, 0, 0 )
+}
 [connection signal="timeout" from="SaveTimer" to="." method="_on_SaveTimer_timeout"]
 [connection signal="timeout" from="LoadTimer" to="." method="_on_LoadTimer_timeout"]
 [connection signal="timeout" from="HideTimer" to="." method="_on_HideTimer_timeout"]

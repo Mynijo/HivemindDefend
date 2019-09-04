@@ -11,9 +11,9 @@ func _init():
 func _input(event):
     if event.is_action_pressed("Debug_input"):
         var test = get_node_path(Vector3(7,2,2),Vector3(2,3,2))
+        for node in test:
+            print(node)
         pass
-
-
 
 func pos_to_id(var pos : Vector3) -> int:
     #return int(pos.x * 10000000 + pos.y * 1000 + pos.z)
