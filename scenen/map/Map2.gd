@@ -203,7 +203,7 @@ func get_node_direction(pos : Vector3) -> Vector3:
     var node = self.map_nodes.get(pos, null)
     if not node:
         return Vector3(0, 0, 0)
-    return $MapGenerator.ORIENTATION_ARRAY[node.get("orientation", 0) % 24].xform_inv(Vector3(1, 0, 0))
+    return $MapGenerator.ORIENTATION_ARRAY[node.get("orientation", 0) % 24].xform(Vector3(1, 0, 0))
 
 
 func get_block(block_name):
