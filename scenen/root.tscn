@@ -34,19 +34,62 @@ one_shot = true
 wait_time = 0.2
 
 [node name="GridMap" type="GridMap" parent="."]
-transform = Transform( -1.62921e-07, 0, 1, 0, 1, 0, -1, 0, -1.62921e-07, 1, 0, 1 )
+transform = Transform( -1.62921e-007, 0, 1, 0, 1, 0, -1, 0, -1.62921e-007, 1, 0, 1 )
 mesh_library = ExtResource( 4 )
 cell_size = Vector3( 1, 1, 1 )
 cell_center_x = false
 cell_center_y = false
 cell_center_z = false
 data = {
-"cells": PoolIntArray( 1, 0, -2147483646, 1, 1, -2147483642, 1, 2, -2147483646, 1, 3, -2147483642, 1, 4, -2147483647, 1, 5, -2147483646, 1, 6, -2147483642, 1, 7, -2147483646, 1, 8, -2147483642, 1, 9, -2146435067, 1, 10, -2146041854, 1, 11, -2147483642, 1, 12, -2146041854, 1, 13, -2147483642, 1, 14, -2147483647, 1, 15, -2147483646, 1, 16, -2147483642, 1, 17, -2147483646, 1, 18, -2147483642, 1, 19, -2147483643, 0, 65535, -2147483646, 1, 65535, -2146435068, 65517, 65535, -2146435067, 65518, 65535, -2146435066, 65519, 65535, -2146435070, 65520, 65535, -2146435066, 65521, 65535, -2146435070, 65522, 65535, -2146435071, 65523, 65535, -2146435066, 65524, 65535, -2146435070, 65525, 65535, -2146435066, 65526, 65535, -2146435070, 65527, 65535, -2146435067, 65528, 65535, -2146435066, 65529, 65535, -2146435070, 65530, 65535, -2146435066, 65531, 65535, -2146435070, 65532, 65535, -2147483647, 65533, 65535, -2146435066, 65534, 65535, -2147483646, 65535, 65535, -2146435066 )
+"cells": PoolIntArray( 1, 0, -2147483646, 1, 1, -2147483642, 1, 2, 2, 1, 3, -2147483642, 1, 4, -2147483647, 1, 5, -2147483646, 1, 6, -2147483642, 1, 7, -2147483646, 1, 8, -2147483642, 1, 9, -2146435067, 1, 10, -2146041854, 1, 11, -2147483642, 1, 12, -2146041854, 1, 13, -2147483642, 1, 14, -2147483647, 1, 15, -2147483646, 1, 16, -2147483642, 1, 17, -2147483646, 1, 18, -2147483642, 1, 19, -2147483643, 0, 65535, -2147483646, 1, 65535, -2146435068, 65517, 65535, -2146435067, 65518, 65535, -2146435066, 65519, 65535, -2146435070, 65520, 65535, -2146435066, 65521, 65535, -2146435070, 65522, 65535, -2146435071, 65523, 65535, -2146435066, 65524, 65535, -2146435070, 65525, 65535, -2146435066, 65526, 65535, -2146435070, 65527, 65535, -2146435067, 65528, 65535, -2146435066, 65529, 65535, -2146435070, 65530, 65535, 1048582, 65531, 65535, 1048578, 65532, 65535, 1, 65533, 65535, 1048582, 65534, 65535, 2, 65535, 65535, 1048582 )
 }
 __meta__ = {
 "_editor_clip_": 0,
 "_editor_floor_": Vector3( 0, 0, 0 )
 }
+
+[node name="DebugInfo" type="Control" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="Labels" type="Container" parent="DebugInfo"]
+anchor_bottom = 1.0
+margin_right = 83.0
+
+[node name="Topic" type="Label" parent="DebugInfo/Labels"]
+margin_right = 70.0
+margin_bottom = 20.0
+text = "Debug Info"
+
+[node name="Coordinate" type="Label" parent="DebugInfo/Labels"]
+margin_top = 20.0
+margin_right = 73.0
+margin_bottom = 34.0
+rect_pivot_offset = Vector2( -180, 170 )
+text = "Coordinate:"
+
+[node name="BlockType" type="Label" parent="DebugInfo/Labels"]
+margin_top = 60.0
+margin_right = 73.0
+margin_bottom = 74.0
+rect_pivot_offset = Vector2( -180, 170 )
+text = "BlockType:"
+
+[node name="CoordinateValue" type="Label" parent="DebugInfo/Labels"]
+margin_left = 20.0
+margin_top = 40.0
+margin_right = 93.0
+margin_bottom = 54.0
+rect_pivot_offset = Vector2( -200, 150 )
+text = "Empty"
+
+[node name="BlockTypeValue" type="Label" parent="DebugInfo/Labels"]
+margin_left = 20.0
+margin_top = 80.0
+margin_right = 93.0
+margin_bottom = 94.0
+rect_pivot_offset = Vector2( -200, 150 )
+text = "Empty"
 [connection signal="timeout" from="SaveTimer" to="." method="_on_SaveTimer_timeout"]
 [connection signal="timeout" from="LoadTimer" to="." method="_on_LoadTimer_timeout"]
 [connection signal="timeout" from="HideTimer" to="." method="_on_HideTimer_timeout"]
