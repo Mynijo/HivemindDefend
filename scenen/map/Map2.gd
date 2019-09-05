@@ -138,32 +138,36 @@ func _set_connectivity(pos, direction):
     elif direction == UP:
         # Without a ramp, you cannot go up
         self_connectivity &= ~(1 << DIRECTION_MASK[UP])
-    elif direction == DOWN and other_block["ramp"]:
+    elif direction == DOWN and other_block["ramp"] and not self_block["ramp"]:
         # There is a ramp below, so only one side option is valid
         self_connectivity &= (1 << DIRECTION_MASK[DOWN]) + (1 << DIRECTION_MASK[-self.get_node_direction(pos + direction)])
     elif direction == DOWN and other_block["traversable"] and not self_block["ramp"]:
-        # A block with air below is not connectable
-        self_connectivity = 0
-    elif not other_block["traversable"]:
+        # With an air block below, you can ONLY go down
+        self_connectivity = (1 << DIRECTION_MASK[DOWN])
+    elif not other_block["traversable"] or (other_block["ramp"] and self.get_node_direction(pos + direction) != -direction):
         self_connectivity &= ~(1 << DIRECTION_MASK[direction])
 
     if !(other_connectivity == null):
         # The other block was nice enough to have their connectivity already calculated, so we are responsible for making the AStar connection
         if (self_connectivity & (1 << DIRECTION_MASK[direction])) and (other_connectivity & (1 << DIRECTION_MASK[-direction])):
             make_astar_connection(pos, pos + direction)
-        else:
-            # Me or the other block said, that a connection is not possible
-            #if self_block["traversable"] and other_block["traversable"]:
-                #print('Connection severed: ', pos, ' <-> ', pos + direction)
-                #print(self_node["block"], ", ", self_connectivity, ", ", direction, ", ", DIRECTION_MASK[direction], ", ", (1 << DIRECTION_MASK[direction]), ", ", self_connectivity & (1 << DIRECTION_MASK[direction]))
-                #print(other_node["block"], ", ", other_connectivity, ", ", -direction, ", ", DIRECTION_MASK[-direction], ", ", (1 << DIRECTION_MASK[-direction]), ", ", other_connectivity & (1 << DIRECTION_MASK[-direction]))
-                #if self_block["ramp"]:
-                #    print(self.get_node_direction(pos))
-                #if other_block["ramp"]:
-                #    print(self.get_node_direction(pos + direction))
-            self_connectivity &= ~(1 << DIRECTION_MASK[direction])
-            other_connectivity &= ~(1 << DIRECTION_MASK[-direction])
-            other_node["connectivity"] = other_connectivity
+        elif self_connectivity & (1 << DIRECTION_MASK[direction]):
+            make_astar_connection(pos, pos + direction, false)  # Not bidirectional
+        elif other_connectivity & (1 << DIRECTION_MASK[-direction]):
+            make_astar_connection(pos + direction, pos, false)  # Not bidirectional
+#        else:
+#            # Me or the other block said, that a connection is not possible
+#            #if self_block["traversable"] and other_block["traversable"]:
+#                #print('Connection severed: ', pos, ' <-> ', pos + direction)
+#                #print(self_node["block"], ", ", self_connectivity, ", ", direction, ", ", DIRECTION_MASK[direction], ", ", (1 << DIRECTION_MASK[direction]), ", ", self_connectivity & (1 << DIRECTION_MASK[direction]))
+#                #print(other_node["block"], ", ", other_connectivity, ", ", -direction, ", ", DIRECTION_MASK[-direction], ", ", (1 << DIRECTION_MASK[-direction]), ", ", other_connectivity & (1 << DIRECTION_MASK[-direction]))
+#                #if self_block["ramp"]:
+#                #    print(self.get_node_direction(pos))
+#                #if other_block["ramp"]:
+#                #    print(self.get_node_direction(pos + direction))
+#            self_connectivity &= ~(1 << DIRECTION_MASK[direction])
+#            other_connectivity &= ~(1 << DIRECTION_MASK[-direction])
+#            other_node["connectivity"] = other_connectivity
 
     self_node["connectivity"] = self_connectivity
 #    if self_block["traversable"] and other_block["traversable"]:
@@ -173,9 +177,12 @@ func _set_connectivity(pos, direction):
 #            print("connectivity: ", (self_connectivity & (1 << DIRECTION_MASK[direction])), " - ", (other_connectivity & (1 << DIRECTION_MASK[-direction])))
 
 
-func make_astar_connection(a, b):
-    print('Connection created: ', a, ' <-> ', b)
-    pathfinding_manager.connect_nodes(a,b)
+func make_astar_connection(from_pos, to_pos, bidirectional=true):
+    if bidirectional:
+        print('Connection created: ', from_pos, ' <-> ', to_pos)
+    else:
+        print('Connection created: ', from_pos, ' --> ', to_pos)
+    pathfinding_manager.connect_nodes(from_pos, to_pos, bidirectional)
 
 
 func _activate_node(pos : Vector3) -> bool:
