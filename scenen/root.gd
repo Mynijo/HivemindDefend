@@ -14,6 +14,7 @@ func _ready():
 #        trans = Transform(basis)
 #        orientation_id = (rotation * trans).basis.get_orthogonal_index()
 #        print(current_orientation_id, " -> ", orientation_id)
+    $Marker.visible = false
     var start_time = OS.get_ticks_msec()
     #$Map.gen_map_with_file("res://scenen/map/test_map_generation_config.json")
     $Map.gen_map_with_file()
@@ -61,13 +62,19 @@ func _input(event):
         var from_pos = $CamBase/Camera.project_ray_origin(mouse_position)
         var to_pos = from_pos + $CamBase/Camera.project_ray_normal(mouse_position) * RAY_LENGTH
         var hit = $Map.get_world().get_direct_space_state().intersect_ray(from_pos, to_pos)
+        var marker_position
         var block_position
         var nearest_air
         if hit:
             if hit.get("collider") == $Map/GridMap:
                 #text = hit.collider.world_to_map(hit.position) * Vector3(1, -1, 1)
-                block_position = (hit.position - 0.1 * hit.normal).round() * Vector3(1, -1, 1)
+                marker_position = (hit.position - 0.1 * hit.normal).round()
+                block_position = marker_position * Vector3(1, -1, 1)
                 nearest_air = (hit.position + 0.5 * hit.normal).round() * Vector3(1, -1, 1)
+                $Marker.translation = marker_position
+                $Marker.visible = true
+            else:
+                $Marker.visible = false
         $DebugInfo/Labels/CoordinateValue.text = str(mouse_position) + ' -> ' + str(hit.get("position")) + " [" + str(block_position) + "]"
         $DebugInfo/Labels/BlockTypeValue.text = str($Map.map_nodes.get(block_position))
         #$DebugInfo/Labels/BlockTypeValue.text = str(hit)
