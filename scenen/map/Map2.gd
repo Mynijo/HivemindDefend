@@ -24,6 +24,7 @@ const DIRECTION_MASK = {EAST: 0,
 const FULL_CONNECTIVITY = (1 << 6) - 1
 
 const BLOCK_UNKNOWN = "Unknown"
+const BLOCK_AIR = "Air"
 
 #class MapNode:
 #    var active = false
@@ -94,8 +95,8 @@ func activate_nodes(pos : Vector3):
     var activated : bool = self._activate_node(pos)
     var queue := []
     var connectivity := 0
-    if self._node_is_transparent(pos):
-        queue.append(pos)
+    #if self._node_is_transparent(pos):
+    queue.append(pos)
     while queue:
         pos = queue.pop_front()
         for direction in [UP, DOWN, NORTH, SOUTH, EAST, WEST]:
@@ -108,11 +109,35 @@ func activate_nodes(pos : Vector3):
     print("Activated the chain ", appended_nodes_num, " times.")
 
 
+func place_block(pos : Vector3, block = BLOCK_UNKNOWN):
+    for direction in [Vector3(0, 0, 0), UP, DOWN, EAST, WEST, NORTH, SOUTH]:
+        self._reset_connectivity(pos + direction)
+        self._deactivate_node(pos + direction)
+    self._set_block(pos, block)
+    self.activate_nodes(pos)
+    self._draw_grid_map()
+
+
+func break_block(pos : Vector3):
+    self.place_block(pos, BLOCK_AIR)
+
+
+func _set_block(pos : Vector3, block = BLOCK_UNKNOWN, orientation = 0):
+    var node = self.map_nodes.get(pos, null)
+    if not node:
+        return
+    node["block"] = block
+    if orientation:
+        node["orientation"] = orientation
+    else:
+        node.erase("orientation")
+
+
 func _set_connectivity(pos, direction):
     var self_node = self.map_nodes.get(pos, null)
     if not self_node:
         return
-    var self_connectivity = self_node.get("connectivity", FULL_CONNECTIVITY)
+    var self_connectivity = int(self_node.get("connectivity", FULL_CONNECTIVITY))
     var self_block = self.get_block(self_node["block"])
 
     var other_node = self.map_nodes.get(pos + direction, null)
@@ -148,6 +173,7 @@ func _set_connectivity(pos, direction):
         self_connectivity &= ~(1 << DIRECTION_MASK[direction])
 
     if !(other_connectivity == null):
+        other_connectivity = int(other_connectivity)
         # The other block was nice enough to have their connectivity already calculated, so we are responsible for making the AStar connection
         if (self_connectivity & (1 << DIRECTION_MASK[direction])) and (other_connectivity & (1 << DIRECTION_MASK[-direction])):
             make_astar_connection(pos, pos + direction)
@@ -169,12 +195,24 @@ func _set_connectivity(pos, direction):
 #            other_connectivity &= ~(1 << DIRECTION_MASK[-direction])
 #            other_node["connectivity"] = other_connectivity
 
-    self_node["connectivity"] = self_connectivity
+    if self_block["traversable"]:
+        self_node["connectivity"] = self_connectivity
+    else:
+        self_node.erase("connectivity")
 #    if self_block["traversable"] and other_block["traversable"]:
 #        print(self.map_nodes[pos], ', ', other_node)
 #        print("connectivity: ", self_connectivity, " - ", other_connectivity)
 #        if other_connectivity != null:
 #            print("connectivity: ", (self_connectivity & (1 << DIRECTION_MASK[direction])), " - ", (other_connectivity & (1 << DIRECTION_MASK[-direction])))
+
+
+func _reset_connectivity(pos : Vector3):
+    var node = self.map_nodes.get(pos, null)
+    if not node:
+        return
+    if node.get("connectivity"):
+        pathfinding_manager.del_nodes(pos)
+    node.erase("connectivity")
 
 
 func make_astar_connection(from_pos, to_pos, bidirectional=true):
@@ -184,7 +222,6 @@ func make_astar_connection(from_pos, to_pos, bidirectional=true):
         print('Connection created: ', from_pos, ' --> ', to_pos)
     pathfinding_manager.connect_nodes(from_pos, to_pos, bidirectional)
 
-
 func _activate_node(pos : Vector3) -> bool:
     var node = self.map_nodes.get(pos, null)
     if not node or node["active"]:
@@ -193,6 +230,14 @@ func _activate_node(pos : Vector3) -> bool:
     var orientation_id = node.get("orientation", 0)
     $GridMap.set_cell_item(pos.x, -pos.y, pos.z, block["block_id"], orientation_id)
     node["active"] = true
+    return true
+
+
+func _deactivate_node(pos : Vector3) -> bool:
+    var node = self.map_nodes.get(pos, null)
+    if not node or not node["active"]:
+        return false
+    node["active"] = false
     return true
 
 
@@ -210,7 +255,7 @@ func get_node_direction(pos : Vector3) -> Vector3:
     var node = self.map_nodes.get(pos, null)
     if not node:
         return Vector3(0, 0, 0)
-    return $MapGenerator.ORIENTATION_ARRAY[node.get("orientation", 0) % 24].xform(Vector3(1, 0, 0))
+    return $MapGenerator.ORIENTATION_ARRAY[int(node.get("orientation", 0)) % 24].xform(Vector3(1, 0, 0))
 
 
 func get_block(block_name):

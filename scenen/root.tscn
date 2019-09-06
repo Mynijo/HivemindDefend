@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=2]
+[gd_scene load_steps=11 format=2]
 
 [ext_resource path="res://scenen/root.gd" type="Script" id=1]
 [ext_resource path="res://scenen/CamBase.gd" type="Script" id=2]
@@ -17,6 +17,14 @@ albedo_color = Color( 1, 0.937255, 0, 0.117647 )
 
 [sub_resource type="CubeMesh" id=2]
 material = SubResource( 3 )
+size = Vector3( 1.1, 1.1, 1.1 )
+
+[sub_resource type="SpatialMaterial" id=4]
+flags_transparent = true
+albedo_color = Color( 0, 0.952941, 1, 0.117647 )
+
+[sub_resource type="CubeMesh" id=5]
+material = SubResource( 4 )
 size = Vector3( 1.1, 1.1, 1.1 )
 
 [node name="root" type="Node"]
@@ -132,8 +140,12 @@ __meta__ = {
 [node name="PathLine" type="ImmediateGeometry" parent="."]
 material_override = SubResource( 1 )
 
-[node name="Marker" type="MeshInstance" parent="."]
+[node name="BlockMarker" type="MeshInstance" parent="."]
 mesh = SubResource( 2 )
+material/0 = null
+
+[node name="AirMarker" type="MeshInstance" parent="."]
+mesh = SubResource( 5 )
 material/0 = null
 [connection signal="timeout" from="SaveTimer" to="." method="_on_SaveTimer_timeout"]
 [connection signal="timeout" from="LoadTimer" to="." method="_on_LoadTimer_timeout"]

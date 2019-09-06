@@ -10,7 +10,7 @@ func _init():
 
 func _input(event):
     if event.is_action_pressed("Debug_input"):
-        var test = get_node_path(Vector3(7,2,2),Vector3(2,3,2))
+        var test = get_node_path(Vector3(2,3,4),Vector3(2,1,1))
         for node in test:
             print(node)
         pass
@@ -23,6 +23,10 @@ func get_node_path(startNode : Vector3, endNode2 : Vector3) -> PoolVector3Array:
     return a_star_map.get_point_path(pos_to_id(startNode),pos_to_id(endNode2))
 
 func del_nodes(node : Vector3):
+    for connection in a_star_map.get_point_connections(pos_to_id(node)):
+        a_star_map.disconnect_points(connection, pos_to_id(node))
+    for connection in a_star_map.get_point_connections(pos_to_id(node)):
+        a_star_map.disconnect_points( pos_to_id(node), connection)
     a_star_map.remove_point(pos_to_id(node))
 
 func disconnect_nodes(startNode : Vector3, endNode2 : Vector3):
